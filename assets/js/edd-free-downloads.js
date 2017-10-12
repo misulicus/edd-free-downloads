@@ -349,7 +349,21 @@ jQuery(document.body).ready(function ($) {
         if (isMobile.any) {
             window.location = window.location + '&edd_action=free_downloads_process_download&download_id=' + download_id + '&price_ids=' + price_ids;
         } else {
-            window.location = window.location + '?edd_action=free_downloads_process_download&download_id=' + download_id + '&price_ids=' + price_ids;
+
+            /**
+             * Checking if we already have a query param on the incoming URL.
+             *
+             * This would most likely come from a 3rd party such as email tracking links.
+             */
+            var url = window.location.toString(),
+                paramCheck = url.split( '?' ),
+                urlQuery = '?'; // This is the default query option
+
+            if ( 'undefined' != typeof( paramCheck[1] ) && paramCheck[1].length > 0 ) {
+                urlQuery = '&'; // Resetting the query option because the URL already has params
+            }
+
+            window.location = window.location + urlQuery + 'edd_action=free_downloads_process_download&download_id=' + download_id + '&price_ids=' + price_ids;
         }
     });
 });
