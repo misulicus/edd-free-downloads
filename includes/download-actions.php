@@ -233,7 +233,6 @@ function edd_free_download_process() {
 		edd_register_and_login_new_user( $account );
 	}
 
-	$payment_meta       = edd_get_payment_meta( $payment_id );
 	$on_complete        = edd_get_option( 'edd_free_downloads_on_complete', 'default' );
 	$success_page       = edd_get_success_page_uri();
 	$custom_url         = edd_get_option( 'edd_free_downloads_redirect', false );
@@ -262,7 +261,7 @@ function edd_free_download_process() {
 		case 'auto-download' :
 			$redirect_url = add_query_arg( array(
 				'edd_action' => 'free_downloads_process_download',
-				'payment-id' => $payment_id
+				'payment-id' => $payment->ID
 			) );
 			break;
 	}
@@ -278,7 +277,7 @@ function edd_free_download_process() {
 		} elseif( ( ! $is_ios && $mobile_on_complete == 'auto-download' ) ) {
 			$redirect_url = add_query_arg( array(
 				'edd_action' => 'free_downloads_process_download',
-				'payment-id' => $payment_id
+				'payment-id' => $payment->ID
 			) );
 		} elseif( ( $is_ios && $apple_on_complete == 'redirect' ) || ( ! $is_ios && $mobile_on_complete == 'redirect' ) ) {
 			$redirect_url = $is_ios ? $apple_custom_url : $mobile_custom_url;
@@ -457,13 +456,17 @@ function edd_free_downloads_process_auto_download() {
 			/**
 			 * actually creating a payment record
 			 */
-			$payment = new EDD_Payment();
-			$payment->user_id = $customer->user_id;
-			$payment->user_email = $user->data->user_email;
+			$payment              = new EDD_Payment();
+			$payment->user_id     = $customer->user_id;
+			$payment->user_email  = $user->data->user_email;
 			$payment->customer_id = $customer->id;
+
 			$payment->add_download( $download_id, array( 'price' => 0 ) );
-			$payment->status = 'publish';
+			$payment->status  = 'publish';
+			$payment->gateway = 'manual';
 			$payment->save();
+
+			$payment->add_note( __( 'Purchased through EDD Free Downloads', 'edd-free-downloads' ) );
 		}
 
 		wp_safe_redirect( add_query_arg( array( 'payment_key' => $payment->key ), edd_get_success_page_uri() ) ); exit;
