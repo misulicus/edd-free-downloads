@@ -107,7 +107,8 @@ function edd_free_downloads_has_newsletter_plugin() {
 		'EDD_Aweber',
 		'EDD_MailPoet',
 		'EDD_Sendy',
-		'EDD_ConvertKit'
+		'EDD_ConvertKit',
+		'EDD_ActiveCampaign'
 	) );
 
 	foreach ( $supported_plugins as $plugin_class ) {
