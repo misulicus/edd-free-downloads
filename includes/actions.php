@@ -108,6 +108,15 @@ function edd_free_downloads_remove_optin() {
 				remove_action( 'edd_complete_download_purchase', array( $edd_convert_kit, 'completed_download_purchase_signup' ) );
 			}
 		}
+
+		// ActiveCampaign
+		if ( class_exists( 'EDD_ActiveCampaign' ) ) {
+			if ( isset( $_POST['edd_free_download_optin'] ) ) {
+				edd_activecampaign()->subscribe_email( $user_info['email'], $user_info['first_name'], $user_info['last_name'] );
+			} else {
+				remove_action( 'edd_complete_download_purchase', array( edd_activecampaign(), 'completed_download_purchase_signup' ) );
+			}
+		}
 	}
 }
 add_action( 'edd_update_payment_status', 'edd_free_downloads_remove_optin', -10 );
