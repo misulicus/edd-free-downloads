@@ -38,33 +38,33 @@ $label = edd_get_option( 'edd_free_downloads_modal_button_label', __( 'Download 
 	<?php endif; ?>
 
 	<?php if ( edd_get_option( 'edd_free_downloads_user_registration', false ) && ! is_user_logged_in() && ! class_exists( 'EDD_Auto_Register' ) ) : ?>
-	<hr />
+		<hr />
 
-	<?php
-	$optional_register = edd_get_option( 'edd_free_downloads_optional_registration' );
-	error_log('optional register: ' . $optional_register);
+		<?php
+		/**
+		 * Checking if registering for the site is optional
+		 */
+		$optional_register = edd_get_option( 'edd_free_downloads_optional_registration' );
+		$required_check = false === $optional_register ? '<span class="edd-free-downloads-required">*</span>' : '';
+		?>
 
-	$required_check = false === $optional_register ? '<span class="edd-free-downloads-required">*</span>' : '';
+		<?php do_action( 'edd_free_downloads_before_modal_form_registration', $post ); ?>
+		<p>
+			<label for="edd_free_download_username" class="edd-free-downloads-label"><?php _e( 'Username', 'edd-free-downloads' ); ?> <?php echo $required_check; ?></label>
+			<input type="text" name="edd_free_download_username" id="edd_free_download_username" class="edd-free-download-field" placeholder="<?php _e( 'Username', 'edd-free-downloads' ); ?>" value="" />
+		</p>
 
-	?>
+		<p>
+			<label for="edd_free_download_pass" class="edd-free-downloads-label"><?php _e( 'Password', 'edd-free-downloads' ); ?> <?php echo $required_check; ?></label>
+			<input type="password" name="edd_free_download_pass" id="edd_free_download_pass" class="edd-free-download-field" />
+		</p>
 
-	<?php do_action( 'edd_free_downloads_before_modal_form_registration', $post ); ?>
-	<p>
-		<label for="edd_free_download_username" class="edd-free-downloads-label"><?php _e( 'Username', 'edd-free-downloads' ); ?> <?php echo $required_check; ?></label>
-		<input type="text" name="edd_free_download_username" id="edd_free_download_username" class="edd-free-download-field" placeholder="<?php _e( 'Username', 'edd-free-downloads' ); ?>" value="" />
-	</p>
+		<p>
+			<label for="edd_free_download_pass2" class="edd-free-downloads-label"><?php _e( 'Confirm Password', 'edd-free-downloads' ); ?> <?php echo $required_check; ?></label>
+			<input type="password" name="edd_free_download_pass2" id="edd_free_download_pass2" class="edd-free-download-field" />
+		</p>
 
-	<p>
-		<label for="edd_free_download_pass" class="edd-free-downloads-label"><?php _e( 'Password', 'edd-free-downloads' ); ?> <?php echo $required_check; ?></label>
-		<input type="password" name="edd_free_download_pass" id="edd_free_download_pass" class="edd-free-download-field" />
-	</p>
-
-	<p>
-		<label for="edd_free_download_pass2" class="edd-free-downloads-label"><?php _e( 'Confirm Password', 'edd-free-downloads' ); ?> <?php echo $required_check; ?></label>
-		<input type="password" name="edd_free_download_pass2" id="edd_free_download_pass2" class="edd-free-download-field" />
-	</p>
-
-	<?php do_action( 'edd_free_downloads_after_modal_form_registration', $post ); ?>
+		<?php do_action( 'edd_free_downloads_after_modal_form_registration', $post ); ?>
 
 	<?php endif; ?>
 
