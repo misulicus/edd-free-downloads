@@ -71,7 +71,7 @@ function edd_free_downloads_add_settings( $settings ) {
 			'name' => __( 'Bypass If Logged In', 'edd-free-downloads' ),
 			'desc' => __( 'Check to bypass the modal if a user is logged in.', 'edd-free-downloads' ),
 			'type' => 'checkbox'
-		)
+		),
 	) );
 
 	$fields_settings = apply_filters( 'edd_free_downloads_fields_settings', array(
@@ -308,6 +308,12 @@ function edd_free_downloads_auto_register_settings( $settings ) {
 				'id'   => 'edd_free_downloads_user_registration',
 				'name' => __( 'User Registration', 'edd-free-downloads' ),
 				'desc' => __( 'Check to display a registration form in the download modal for logged-out users.', 'edd-free-downloads' ),
+				'type' => 'checkbox',
+			),
+			array(
+				'id'   => 'edd_free_downloads_optional_registration',
+				'name' => __( 'Select to make registration optional', 'edd-free-downloads' ),
+				'desc' => __( 'This option makes registration to the site optional' ),
 				'type' => 'checkbox',
 			)
 		);
