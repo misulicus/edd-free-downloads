@@ -49,6 +49,11 @@ $label = edd_get_option( 'edd_free_downloads_modal_button_label', __( 'Download 
 		?>
 
 		<?php do_action( 'edd_free_downloads_before_modal_form_registration', $post ); ?>
+
+		<?php if ( true === (bool)$optional_register ) : ?>
+			<p><?php esc_html_e( 'Registration is optional', 'edd-free-downloads' ); ?></p>
+		<?php endif; ?>
+
 		<p>
 			<label for="edd_free_download_username" class="edd-free-downloads-label"><?php _e( 'Username', 'edd-free-downloads' ); ?> <?php echo $required_check; ?></label>
 			<input type="text" name="edd_free_download_username" id="edd_free_download_username" class="edd-free-download-field" placeholder="<?php _e( 'Username', 'edd-free-downloads' ); ?>" value="" />
