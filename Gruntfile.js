@@ -1,5 +1,7 @@
 module.exports = function(grunt) {
 
+// Props to https://github.com/3themes/spring-theme for basic Gruntfile set up
+
 // Load all grunt-* tasks (load-grunt-tasks plugin)
 require('load-grunt-tasks')(grunt);
 
@@ -10,11 +12,6 @@ grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
     cssmin: {
-        // combine: {
-        //     files: {
-        //         'assets/css/style.css': 'assets/css/style.css.min'
-        //     }
-        // }
         minify: {
             files: [
                 {
