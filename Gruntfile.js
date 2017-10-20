@@ -37,6 +37,4 @@ grunt.initConfig({
 // Default task is to rebuild
 grunt.registerTask('default', ['cssmin', 'uglify']);
 
-// Tasks for development
-// grunt.registerTask('build', ['sass', 'cssmin', 'concat', 'uglify']);
 };
