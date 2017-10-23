@@ -15,8 +15,11 @@ grunt.initConfig({
         minify: {
             files: [
                 {
-                    src: 'assets/css/style.css',
-                    dest: 'assets/css/style.min.css'
+                    'assets/css/style.min.css' : 'assets/css/style.css',
+                    'assets/css/admin.min.css' : 'assets/css/admin.css'
+
+                    // src: 'assets/css/style.css',
+                    // dest: 'assets/css/style.min.css'
                 }
             ]
         },
@@ -28,8 +31,11 @@ grunt.initConfig({
 
     uglify: {
         build: {
-            src: 'assets/js/edd-free-downloads.js',
-            dest: 'assets/js/edd-free-downloads.min.js'
+            files: {
+                'assets/js/edd-free-downloads.min.js': 'assets/js/edd-free-downloads.js',
+                'assets/js/admin.min.js': 'assets/js/admin.js',
+                'assets/js/isMobile.min.js': 'assets/js/isMobile.js'
+            }
         }
     },
 });
