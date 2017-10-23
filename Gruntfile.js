@@ -17,9 +17,6 @@ grunt.initConfig({
                 {
                     'assets/css/style.min.css' : 'assets/css/style.css',
                     'assets/css/admin.min.css' : 'assets/css/admin.css'
-
-                    // src: 'assets/css/style.css',
-                    // dest: 'assets/css/style.min.css'
                 }
             ]
         },
