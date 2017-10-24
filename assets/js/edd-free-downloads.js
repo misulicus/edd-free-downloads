@@ -1,16 +1,25 @@
-/*global jQuery, document, edd_free_downloads_vars, jBox, isMobile*/
+/*global jQuery, document, edd_free_downloads_vars, isMobile*/
 /*jslint newcap: true*/
 jQuery(document.body).ready(function ($) {
     'use strict';
 
-    var newModal;
+    var body = $(document.body);
+    /**
+     * This function controls the closing of the modal by either
+     * clicking the close 'x', outside the modal, or pressing the escape key.
+     */
+    function eddFreeDownloadCloseModal() {
+        $( '.edd-free-downloads-modal-wrapper' ).fadeOut( 250 ); // Hiding the modal wrapper again
+        $( '#edd-free-downloads-modal' ).hide().html('');
+        $( 'body' ).removeClass( 'edd-frozen' );
+    }
 
     if ($('input[name="edd_options[price_id][]"]').length > 0) {
         var classes, wrapperPrefix, linkPrefix, linkSuffix, wrapperSuffix, href;
 
         classes = $('.edd_purchase_submit_wrapper').find('a.edd-add-to-cart').attr('class');
 
-        if( ! classes ){
+        if (!classes) {
             return;
         }
 
@@ -47,7 +56,7 @@ jQuery(document.body).ready(function ($) {
                 $(this).parent().find('.edd-free-downloads-variable').attr('data-download-id', download_id);
 
                 if ($(this).prev().find('input[name="edd_options[price_id][]"]:checked').attr('data-price') === '0.00') {
-                    var dlUrl = $(this).parent().find('.edd-free-downloads-variable').attr('href');
+                    var dlUrl    = $(this).parent().find('.edd-free-downloads-variable').attr('href');
                     var selected = $(this).prev().find('input[name="edd_options[price_id][]"]:checked').val();
 
                     $(this).css('display', 'none');
@@ -65,12 +74,12 @@ jQuery(document.body).ready(function ($) {
             }
         });
 
-        $(document.body).on('change', 'input[name="edd_options[price_id][]"]', function () {
-            var total = 0;
+        body.on('change', 'input[name="edd_options[price_id][]"]', function () {
+            var total   = 0;
             var checked = 0;
             var priceId = 0;
-            var dlUrl = $(this).closest('.edd_download_purchase_form').find('a.edd-free-downloads-variable').attr('href');
-            var dlId = $(this).closest('.edd_download_purchase_form').find('.edd_purchase_submit_wrapper').find('.edd-add-to-cart').attr('data-download-id');
+            var dlUrl   = $(this).closest('.edd_download_purchase_form').find('a.edd-free-downloads-variable').attr('href');
+            var dlId    = $(this).closest('.edd_download_purchase_form').find('.edd_purchase_submit_wrapper').find('.edd-add-to-cart').attr('data-download-id');
 
             $(this).closest('ul').find('input[name="edd_options[price_id][]"]').each(function () {
                 if ($(this).is(':checked')) {
@@ -105,8 +114,12 @@ jQuery(document.body).ready(function ($) {
         });
     }
 
+    /**
+     * The user clicked the download button from the shortcode output.
+     * We will use an ajax call to populate the modal.
+     */
     if (isMobile.any) {
-        $(document.body).on('click', '.edd-free-download', function (e) {
+        body.on( 'click', 'a.edd-free-download', function(e) {
             e.preventDefault();
 
             // Select email field on click
@@ -116,254 +129,269 @@ jQuery(document.body).ready(function ($) {
             window.location.href = $(this).attr('href');
         });
 
-        $(document.body).on('click', '.edd-free-download-cancel', function () {
+        body.on('click', '.edd-free-download-cancel', function () {
             parent.history.back();
             return false;
         });
     } else {
-        newModal = new jBox('Modal', {
-            attach: $('.edd-free-download'),
-            content: $('#edd-free-downloads-modal'),
-            width: 350,
-            delayClose: 3000,
-            closeButton: edd_free_downloads_vars.close_button,
-            onClose: function() {
-                $('.edd-free-download-submit').removeAttr('disabled');
-                $('.edd-free-download-submit span').html(edd_free_downloads_vars.modal_download_label);
+        body.on( 'click', 'a.edd-free-download', function() {
 
-                if ($('div#edd-free-downloads-modal .edd-free-downloads-direct-download-link').length > 0) {
-                    $('div#edd-free-downloads-modal .edd-free-downloads-direct-download-link').css('display', 'block');
-                }
+            var edd_download_id = $( this ).data( 'download-id' );
+            var price_ids       = [];
+            var variable_prices = $(this).parent().parent().find('input[name="edd_options[price_id][]"]');
+            if (variable_prices.length > 0) {
+                variable_prices.each(function () {
+                    $(this).parent().parent().find('input[name="edd_options[price_id][]"]').each(function () {
+                        if ($(this).prop('checked') || $(this).attr('type') === 'hidden') {
+                            price_ids.push($(this).val().toString());
+                        }
+                    });
+                });
             }
-        });
 
-        $(document.body).on('click', '.edd-free-download', function (e) {
-            e.preventDefault();
 
-            var button = $(this);
-            var download_id = $(this).data('download-id');
-            var button_html = $(this).html();
+            var modal_wrapper = $('.edd-free-downloads-modal-wrapper');
+            modal_wrapper.fadeIn( 250 );
 
-            button.append(' <i class="edd-icon-spinner edd-icon-spin"></i>');
 
-            // Setup the notes field
-            if (edd_free_downloads_vars.is_download === 'false') {
-                $('.edd-free-downloads-note-content').html('<div style="text-align:center">' + edd_free_downloads_vars.loading_text + ' <i class="edd-icon-spinner edd-icon-spin"></i></div>');
+            $.ajax({
+                url: edd_free_downloads_vars.ajaxurl,
+                type: 'GET',
+                data: {
+                    'action': 'edd_free_downloads_get_modal',
+                    'download_id': edd_download_id,
+                    'price_ids' : price_ids,
+                    'edd_is_mobile': edd_free_downloads_vars.edd_is_mobile,
+                    'require_name': edd_free_downloads_vars.require_name,
+                    'success_page': edd_free_downloads_vars.success_page,
+                },
+                success: function( data ) {
 
-                var postData = {
-                    action : 'edd_free_downloads_get_notes',
-                    download_id: download_id
-                };
+                    /**
+                     * Caching `body` as it is used on key presses and clicks below.
+                     * Setting closeButtonDOM to allow for an empty value by default.
+                     */
+                    var closeButtonDOM = '';
 
-                $.ajax({
-                    type: 'POST',
-                    data: postData,
-                    dataType: 'json',
-                    url: edd_free_downloads_vars.ajaxurl,
-                    success: function (response) {
-                        if (response !== null) {
-                            if (response.title !== '') {
-                                $('.edd-free-downloads-note-title strong').html(response.title);
+                    body.addClass( 'edd-frozen' );
+
+                    var modal_container = $('#edd-free-downloads-modal');
+                    modal_container.prepend( data ).fadeIn(250);
+
+
+                    $( '.edd-free-downloads-modal-wrapper .edd-free-downloads-modal-close' ).on( 'click', function() {
+                        eddFreeDownloadCloseModal();
+                    } );
+
+                    modal_container.find('input').first().focus();
+
+                    modal_container.on( 'click', '.edd-free-download-submit', function(e) {
+
+                        var has_error = 0;
+                        /**
+                         * Making sure we have a valid email address
+                         */
+                        var email = modal_wrapper.find('input[name="edd_free_download_email"]');
+                        var regex = /^((([A-Za-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([A-Za-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([A-Za-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([A-Za-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([A-Za-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([A-Za-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([A-Za-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([A-Za-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([A-Za-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([A-Za-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/;
+
+                        if ( email.val() === '' ) {
+                            $( '.edd-free-download-errors' ).show();
+                            $('#edd-free-download-error-email-required').css('display', 'block');
+
+                            has_error++;
+                            e.preventDefault();
+                        } else {
+                            $('#edd-free-download-error-email-required').css('display', 'none');
+
+                            if ( ! regex.test( email.val() ) ) {
+                                $( '.edd-free-download-errors' ).show();
+                                $('#edd-free-download-error-email-invalid').css('display', 'block');
+
+                                has_error++;
+                                e.preventDefault();
+                            } else {
+                                $('#edd-free-download-error-email-invalid').css('display', 'none');
+                            }
+                        }
+                        /**
+                         * End email check
+                         */
+
+                        /**
+                         * First and Last name check if the option is set
+                         */
+                        if ( 'true' === edd_free_downloads_vars.require_name ) {
+
+                            var fname = $( '.edd-free-downloads-modal-wrapper input[name="edd_free_download_fname"]' );
+                            var lname = $( '.edd-free-downloads-modal-wrapper input[name="edd_free_download_lname"]' );
+
+                            if ('' === fname.val()) {
+                                $( '.edd-free-download-errors' ).show();
+                                $('#edd-free-download-error-fname-required').css('display', 'block');
+
+                                has_error++;
+                                e.preventDefault();
+                            } else {
+                                $('#edd-free-download-error-fname-required').css('display', 'none');
+                            } // End checking first name
+
+                            if ('' === lname.val()) {
+                                $( '.edd-free-download-errors' ).show();
+                                $('#edd-free-download-error-lname-required').css('display', 'block');
+
+                                has_error++;
+                                e.preventDefault();
+                            } else {
+                                $('#edd-free-download-error-lname-required').css('display', 'none');
+                            } // End checking last name
+
+                        } // End true check on required_name
+
+                        if (edd_free_downloads_vars.user_registration === 'true') {
+                            var username, password, password2;
+
+                            username  = $('input[name="edd_free_download_username"]');
+                            password  = $('input[name="edd_free_download_pass"]');
+                            password2 = $('input[name="edd_free_download_pass2"]');
+
+                            if (username.val() === '') {
+                                $('#edd-free-download-error-username-required').css('display', 'block');
+
+                                has_error++;
+                            } else {
+                                $('#edd-free-download-error-username-required').css('display', 'none');
                             }
 
-                            if (response.content !== '') {
-                                $('.edd-free-downloads-note-content').html(response.content);
+                            if (password.val() === '') {
+                                $('#edd-free-download-error-password-required').css('display', 'block');
+
+                                has_error++;
+                            } else {
+                                $('#edd-free-download-error-password-required').css('display', 'none');
+                            }
+
+                            if (password2.val() === '') {
+                                $('#edd-free-download-error-password2-required').css('display', 'block');
+
+                                has_error++;
+                            } else {
+                                $('#edd-free-download-error-password2-required').css('display', 'none');
+                            }
+
+                            if (password.val() !== '' && password2.val() !== '') {
+                                if (password.val() !== password2.val()) {
+                                    $('#edd-free-download-error-password-unmatch').css('display', 'block');
+
+                                    has_error++;
+                                } else {
+                                    $('#edd-free-download-error-password-unmatch').css('display', 'none');
+                                }
                             }
                         }
 
-                        if (! isMobile.any) {
-                            newModal.open();
+                        if (has_error === 0) {
+                            $('#edd_free_download_form').submit();
+                            $('.edd-free-download-submit span').html(edd_free_downloads_vars.download_loading);
+                            $('.edd-free-download-submit span').append('<i class="edd-icon-spinner edd-icon-spin"></i>');
+                            $('.edd-free-download-submit').attr('disabled', 'disabled');
+
+                            eddFreeDownloadCloseModal();
+                        } else {
+                            $('.edd-free-download-errors').css('display', 'block');
+                            $('.edd-free-download-submit').removeAttr('disabled');
+                            e.preventDefault();
                         }
 
-                        button.html(button_html);
-                    }
-                }).fail(function (data) {
-                    if ( window.console && window.console.log ) {
-                        console.log( data );
-                    }
-                });
-            } else {
-                button.html(button_html);
-            }
+                    } ); // End validation checks
 
-            // Select email field on click
-            $('input[name="edd_free_download_email"]').focus();
-            $('input[name="edd_free_download_email"]').select();
+                    $( '#edd-free-downloads-modal' ).on( 'click', 'a.edd-free-downloads-direct-download-link', function( e ) {
+                        e.preventDefault();
+                        edd_fd_process_direct_download_link($(this ));
+                    });
 
-            $('input[name="edd_free_download_id"]').val(download_id);
+                    /**
+                     * Stopping propagation here allows the user to click on the modal without closing it
+                     */
+                    $( '#edd-free-downloads-modal' ).on( 'click', function(e) {
+                        e.stopPropagation();
+                    });
 
-            if ($(this).parent().parent().find('input[name="edd_options[price_id][]"]').length > 0) {
-                $('input[name="edd_free_download_price_id[]"]').remove();
+                    /**
+                     * If the user clicks outside the modal we remove it here
+                     * and hide the wrapper again
+                     */
+                    $( '#edd-free-downloads-modal' ).parent('.edd-free-downloads-modal-wrapper').on( 'click', function() {
+                        eddFreeDownloadCloseModal();
+                    });
 
-                $(this).parent().parent().find('input[name="edd_options[price_id][]"]').each(function () {
-                    if ($(this).prop('checked') || $(this).attr('type') === 'hidden') {
-                        $('.edd-free-download-submit').before('<input type="hidden" name="edd_free_download_price_id[]" value="' + $(this).val().toString() + '"/>');
-                    }
-                });
-            }
+                    /**
+                     * If you user is focused on the email field and presses enter
+                     * this will "click" the download botton
+                     */
+                    body.on('keypress', '.edd-free-download-field', function (e) {
+                        if (e.which === 13) {
+                            $('.edd-free-download-submit').click();
+                            return false;
+                        }
+                    });
+
+                    /**
+                     * Allowing for pressing escape key to close modal
+                     */
+                    body.on( 'keyup', function( e ) {
+                        if ( 27 === e.keyCode ) {
+                            eddFreeDownloadCloseModal();
+                        }
+                    });
+
+                } // End success.
+
+            }); // End AJAX call.
+
         });
-    }
+    }  // End on click.
 
-    $(document.body).on('keypress', '.edd-free-download-field', function (e) {
-        if (e.which === 13) {
-            $('.edd-free-download-submit').click();
-            return false;
-        }
+    body.on( 'click', 'a.edd-free-downloads-direct-download-link', function( e ) {
+        e.preventDefault();
+        edd_fd_process_direct_download_link($(this ));
     });
 
-    $(document.body).on('click', '.edd-free-download-submit', function (e) {
-        var email, regex, has_error = 0;
+    function edd_fd_process_direct_download_link( target ) {
 
-        // Disable the submit button
-        $('.edd-free-download-submit').attr('disabled', 'disabled');
+        var price_ids = [];
+        var download_id = target.parent().parent().find('input[name="edd_free_download_id"]').val();
 
-        // Remove the direct download link
-        if ($('.edd-free-downloads-direct-download-link').length > 0) {
-            $('.edd-free-downloads-direct-download-link').fadeOut('fast', function () {
-                $(this).css('display', 'none');
+        if( ! download_id ) {
+            download_id = target.parent().parent().find('.edd-free-download').data('download-id');
+        }
+
+        if( ! download_id ) {
+            download_id = target.data('download-id');
+        }
+
+        if (target.parent().parent().find('input[name="edd_free_download_price_id[]"]').length > 0) {
+            target.parent().parent().find('input[name="edd_free_download_price_id[]"]').each(function () {
+                price_ids.push($(this).val().toString());
+            });
+        } else if (target.parent().parent().find('input[name="edd_options[price_id][]"]:checked').length > 0) {
+            target.parent().parent().find('input[name="edd_options[price_id][]"]:checked').each(function () {
+                price_ids.push($(this).val().toString());
             });
         }
 
-        email = $('input[name="edd_free_download_email"]');
-        regex = /^((([A-Za-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([A-Za-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([A-Za-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([A-Za-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([A-Za-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([A-Za-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([A-Za-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([A-Za-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([A-Za-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([A-Za-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/;
+        var redirect = window.location.href;
 
-        if (email.val() === '') {
-            $('#edd-free-download-error-email-required').css('display', 'block');
-
-            has_error++;
+        if ( redirect.indexOf('?') !== -1 ) {
+            redirect = redirect + '&';
         } else {
-            $('#edd-free-download-error-email-required').css('display', 'none');
-
-            if (!regex.test(email.val())) {
-                $('#edd-free-download-error-email-invalid').css('display', 'block');
-
-                has_error++;
-            } else {
-                $('#edd-free-download-error-email-invalid').css('display', 'none');
-            }
+            redirect = redirect + '?';
         }
-
-        if (edd_free_downloads_vars.require_name === 'true') {
-            var fname, lname;
-
-            fname = $('input[name="edd_free_download_fname"]');
-            lname = $('input[name="edd_free_download_lname"]');
-
-            if (fname.val() === '') {
-                $('#edd-free-download-error-fname-required').css('display', 'block');
-
-                has_error++;
-            } else {
-                $('#edd-free-download-error-fname-required').css('display', 'none');
-            }
-
-            if (lname.val() === '') {
-                $('#edd-free-download-error-lname-required').css('display', 'block');
-
-                has_error++;
-            } else {
-                $('#edd-free-download-error-lname-required').css('display', 'none');
-            }
-        }
-
-
-        if (edd_free_downloads_vars.user_registration === 'true') {
-            var username, password, password2;
-
-            username = $('input[name="edd_free_download_username"]');
-            password = $('input[name="edd_free_download_pass"]');
-            password2 = $('input[name="edd_free_download_pass2"]');
-
-            if (username.val() === '') {
-                $('#edd-free-download-error-username-required').css('display', 'block');
-
-                has_error++;
-            } else {
-                $('#edd-free-download-error-username-required').css('display', 'none');
-            }
-
-            if (password.val() === '') {
-                $('#edd-free-download-error-password-required').css('display', 'block');
-
-                has_error++;
-            } else {
-                $('#edd-free-download-error-password-required').css('display', 'none');
-            }
-
-            if (password2.val() === '') {
-                $('#edd-free-download-error-password2-required').css('display', 'block');
-
-                has_error++;
-            } else {
-                $('#edd-free-download-error-password2-required').css('display', 'none');
-            }
-
-            if (password.val() !== '' && password2.val() !== '') {
-                if (password.val() !== password2.val()) {
-                    $('#edd-free-download-error-password-unmatch').css('display', 'block');
-
-                    has_error++;
-                } else {
-                    $('#edd-free-download-error-password-unmatch').css('display', 'none');
-                }
-            }
-        }
-
-        if (has_error === 0) {
-            $('#edd_free_download_form').submit();
-            $('.edd-free-download-submit span').html(edd_free_downloads_vars.download_loading);
-            $('.edd-free-download-submit span').append('<i class="edd-icon-spinner edd-icon-spin"></i>');
-            $('.edd-free-download-submit').attr('disabled', 'disabled');
-            newModal.close();
-        } else {
-            $('.edd-free-download-errors').css('display', 'block');
-            $('.edd-free-download-submit').removeAttr('disabled');
-            e.preventDefault();
-        }
-    });
-
-    $(document.body).on('click', '.edd-free-downloads-direct-download-link', function (e) {
-        e.preventDefault();
 
         if (! isMobile.any) {
-            newModal.close();
+            eddFreeDownloadCloseModal();
         }
 
-        var price_ids = '';
-        var download_id = $(this).parent().parent().find('input[name="edd_free_download_id"]').val();
+        window.location = redirect + 'edd_action=free_downloads_process_download&download_id=' + download_id + '&price_ids=' + price_ids;
 
-        if( ! download_id ) {
-            download_id = $(this).parent().parent().find('.edd-free-download').data('download-id');
-        }
-
-        if( ! download_id ) {
-            download_id = $(this).data('download-id');
-        }
-
-        if ($(this).parent().parent().find('input[name="edd_free_download_price_id[]"]').length > 0) {
-            $(this).parent().parent().find('input[name="edd_free_download_price_id[]"]').each(function () {
-                price_ids = price_ids + $(this).val().toString();
-            });
-        }
-
-        if (isMobile.any) {
-            window.location = window.location + '&edd_action=free_downloads_process_download&download_id=' + download_id + '&price_ids=' + price_ids;
-        } else {
-
-            /**
-             * Checking if we already have a query param on the incoming URL.
-             *
-             * This would most likely come from a 3rd party such as email tracking links.
-             */
-            var url = window.location.toString(),
-                paramCheck = url.split( '?' ),
-                urlQuery = '?'; // This is the default query option
-
-            if ( 'undefined' != typeof( paramCheck[1] ) && paramCheck[1].length > 0 ) {
-                urlQuery = '&'; // Resetting the query option because the URL already has params
-            }
-
-            window.location = window.location + urlQuery + 'edd_action=free_downloads_process_download&download_id=' + download_id + '&price_ids=' + price_ids;
-        }
-    });
+    }
 });

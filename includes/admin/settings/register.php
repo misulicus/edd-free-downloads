@@ -110,15 +110,6 @@ function edd_free_downloads_add_settings( $settings ) {
 			'type' => 'checkbox'
 		),
 		array(
-			'id'            => 'edd_free_downloads_notes_loading_label',
-			'name'          => __( 'Notes Loading Label', 'edd-free-downloads' ),
-			'desc'          => __( 'Enter the text to show while notes are loading.', 'edd-free-downloads' ),
-			'type'          => 'text',
-			'std'           => __( 'Loading...', 'edd-free-downloads' ),
-			'tooltip_title' => __( 'Notes Loading Label', 'edd-free-downloads' ),
-			'tooltip_desc'  => __( 'On multi-product pages, such as the download list page, notes are loaded through AJAX and may have a slight delay before they show up. This field determines what is shown while the notes are loading.', 'edd-free-downloads' )
-		),
-		array(
 			'id'   => 'edd_free_downloads_notes_title',
 			'name' => __( 'Notes Field Title', 'edd-free-downloads' ),
 			'desc' => __( 'Enter the title to display for the notes field, or leave blank for none.', 'edd-free-downloads' ),
@@ -227,7 +218,7 @@ function edd_free_downloads_add_settings( $settings ) {
 		array(
 			'id'   => 'edd_free_downloads_direct_download_label',
 			'name' => __( 'Direct Download Label', 'edd-free-downloads' ),
-			'desc' => __( 'Enter the text do display for the direct download link', 'edd-free-downloads' ),
+			'desc' => __( 'Enter the text to display for the direct download link', 'edd-free-downloads' ),
 			'type' => 'text',
 			'std'  => __( 'No thanks, proceed to download', 'edd-free-downloads' )
 		),

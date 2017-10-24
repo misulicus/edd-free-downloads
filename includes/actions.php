@@ -312,3 +312,87 @@ function edd_free_downloads_get_notes() {
 }
 add_action( 'wp_ajax_edd_free_downloads_get_notes', 'edd_free_downloads_get_notes' );
 add_action( 'wp_ajax_nopriv_edd_free_downloads_get_notes', 'edd_free_downloads_get_notes' );
+
+/**
+ * This function and related actions are called via an AJAX
+ * request to trigger the modal for Free Downloads.
+ *
+ * @return string HTML output for the Free Downloads modal
+ */
+function edd_free_downloads_get_modal() {
+
+	edd_get_template_part( 'download', 'modal' );
+
+	edd_die();
+}
+add_action( 'wp_ajax_edd_free_downloads_get_modal', 'edd_free_downloads_get_modal' );
+add_action( 'wp_ajax_nopriv_edd_free_downloads_get_modal', 'edd_free_downloads_get_modal' );
+
+
+
+
+
+
+
+
+function edd_free_downloads_get_file_path() {
+
+	$post_id = ! empty( $_GET['download_id'] ) ? intval( $_GET['download_id'] ) : false;
+
+	if ( false !== $post_id ) {
+
+		$download_file = get_post_meta( $post_id, 'edd_download_files', true );
+		$download_file = wp_list_pluck( $download_file, 'file' );
+
+		/**
+		 * If we have more than one file we will zip them up here
+		 * and update the URL appropriately.
+		 */
+		if ( count( $download_file ) > 1 ) {
+			$download_file = edd_free_downloads_compress_files( $download_file );
+			$download_file = str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $download_file );
+		} else {
+			/**
+			 * We are dealing with a single file download
+			 * @var [type]
+			 */
+			if ( isset( $download_file[1] ) ) {
+				$download_file = $download_file[1];
+			} else {
+				/**
+				 * Accounting for purchases with no download file
+				 */
+				$download_file = '';
+			}
+		}
+
+		/**
+		 * Note that wp_send_json also does die()
+		 */
+		wp_send_json( $download_file );
+	}
+
+	edd_die();
+}
+add_action( 'wp_ajax_edd_free_downloads_get_file_path', 'edd_free_downloads_get_file_path' );
+add_action( 'wp_ajax_nopriv_edd_free_downloads_get_file_path', 'edd_free_downloads_get_file_path' );
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * This function creates a wrapper div needed to allow for
+ * javascript targeting of the inner modal elements
+ */
+function edd_free_downloads_add_modal_wrapper() {
+	echo '<div class="edd-free-downloads-modal-wrapper edd-free-downloads"><div id="edd-free-downloads-modal" style="display:none"></div></div>';
+}
+add_action( 'wp_footer', 'edd_free_downloads_add_modal_wrapper' );

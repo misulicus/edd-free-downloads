@@ -405,7 +405,7 @@ msgid "Direct Download Label"
 msgstr ""
 
 #: includes/admin/settings/register.php:176
-msgid "Enter the text do display for the direct download link"
+msgid "Enter the text to display for the direct download link"
 msgstr ""
 
 #: includes/admin/settings/register.php:178 templates/download-modal.php:112

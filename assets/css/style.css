@@ -1,4 +1,75 @@
 /** Modal CSS **/
+body.edd-frozen {
+    position: relative; // Needed to allow edd-free-downloads-modal-wrapper to extend to the bottom of the <body>
+    overflow: hidden;
+}
+
+.edd-free-downloads-modal-wrapper {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba( 0, 0, 0, .6 );
+    z-index: 999;
+    padding: 5% 0 0;
+    overflow-y: scroll;
+    transition: display 0.5s ease;
+    -webkit-transition: display 0.5s ease;
+    -moz-transition: display 0.5s ease;
+}
+
+@media screen and ( max-width: 1200px ) {
+
+    .edd-free-downloads-modal-wrapper {
+        padding: 17% 0 0;
+    }
+}
+
+.edd-free-downloads.hidden {
+    display: none;
+}
+
+#edd-free-downloads-modal {
+    background: #fff;
+    width: 350px;
+    max-width: 95%;
+    margin: 0 auto;
+    border-radius: 5px;
+    padding: 1%;
+    position: relative;
+}
+
+form#edd_free_download_form {
+    position: relative;
+}
+
+.edd-free-downloads-modal-close {
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: #fff;
+    border-radius: 50%;
+    color: #999;
+    transition: color 0.5s ease;
+}
+
+.admin-bar .edd-free-downloads-modal-close {
+    padding-top: 2px;
+    padding-left: 1px;
+}
+
+.edd-free-downloads-modal-close:hover {
+    cursor: pointer;
+    color: #555;
+    transition: color 0.5s ease;
+    -webkit-transition: color 0.5s ease;
+    -moz-transition: color 0.5s ease;
+}
+
 #edd-free-downloads-modal label {
     font-weight: bold;
     display: block;
@@ -23,15 +94,13 @@
     width: 100%;
 }
 
-#edd-free-downloads-modal button {
+#edd-free-downloads-modal button,
+#edd-free-downloads-modal a.button {
     width: 100%;
 }
 
-.edd-free-downloads-hidden {
-    display: none;
-}
-
-.edd-free-downloads-mobile {
+#edd-free-downloads-modal.edd-free-downloads-mobile {
+    background-color: inherit;
     padding: 25px;
 }
 

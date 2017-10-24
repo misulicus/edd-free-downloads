@@ -31,7 +31,7 @@ function edd_free_download_process() {
 	}
 
 	if ( ! isset( $_POST['edd_free_download_email'] ) ) {
-		wp_die( __( 'An internal error has occurred, please try again or contact support.', 'edd-free-downloads' ), __( 'Oops!', 'edd-free-downloads' ), array( 'back_link' => true ) );
+		wp_die( __( 'An internal error has occurred, please try again or contact support. Email address not provided.', 'edd-free-downloads' ), __( 'Oops!', 'edd-free-downloads' ), array( 'back_link' => true ) );
 	}
 
 	if ( ! is_user_logged_in() ) {
@@ -151,6 +151,9 @@ function edd_free_download_process() {
 		$price_ids = sanitize_text_field( $_GET['price_ids'] );
 	}
 
+	// Keep an array of files that are going to be delivered for the selected item.
+	$download_files = array();
+
 	if ( isset( $price_ids ) && is_array( $price_ids ) ) {
 		foreach ( $price_ids as $cart_id => $price_id ) {
 			/**
@@ -160,6 +163,11 @@ function edd_free_download_process() {
 			 */
 			if ( ! edd_is_free_download( $download_id, $price_id ) ) {
 				wp_die( __( 'The requested product is not a free product! Please try again or contact support.', 'edd-free-downloads' ), __( 'Oops!', 'edd-free-downloads' ) );
+			}
+
+			$item_files = edd_get_download_files( $download_id, $price_id );
+			if ( ! empty ( $item_files ) ) {
+				$download_files[] = $item_files;
 			}
 
 			$payment->add_download( $download_id, array(
@@ -181,7 +189,10 @@ function edd_free_download_process() {
 			wp_die( __( 'The requested product is not a free product! Please try again or contact support.', 'edd-free-downloads' ), __( 'Oops!', 'edd-free-downloads' ) );
 		}
 
-		$download_files[] = edd_get_download_files( $download_id, $price_ids );
+		$item_files = edd_get_download_files( $download_id, $price_ids );
+		if ( ! empty ( $item_files ) ) {
+			$download_files[] = $item_files;
+		}
 
 		$payment->add_download( $download_id, array(
 			'price_id'   => $price_ids,
@@ -195,7 +206,12 @@ function edd_free_download_process() {
 		 * will set it to `false` below.
 		 */
 		if ( ! edd_is_free_download( $download_id ) ) {
-			wp_die( __( 'An internal error has occurred, please try again or contact support.', 'edd-free-downloads' ), __( 'Oops!', 'edd-free-downloads' ) );
+			wp_die( __( 'An internal error has occurred, please try again or contact support. Invalid item.', 'edd-free-downloads' ), __( 'Oops!', 'edd-free-downloads' ) );
+		}
+
+		$item_files = edd_get_download_files( $download_id );
+		if ( ! empty ( $item_files ) ) {
+			$download_files[] = $item_files;
 		}
 
 		$payment->add_download( $download_id, array(
@@ -233,6 +249,7 @@ function edd_free_download_process() {
 		edd_register_and_login_new_user( $account );
 	}
 
+	$payment_meta       = edd_get_payment_meta( $payment->ID );
 	$on_complete        = edd_get_option( 'edd_free_downloads_on_complete', 'default' );
 	$success_page       = edd_get_success_page_uri();
 	$custom_url         = edd_get_option( 'edd_free_downloads_redirect', false );
@@ -246,17 +263,22 @@ function edd_free_download_process() {
 
 	/**
 	 * This accounts for logged in users when no download file is attached to the purchase.
+	 *
+	 * Also logic to make sure if the custom redirect option is set
 	 */
-	if ( empty( $download_files ) ) {
+	edd_debug_log( 'Free Downloads: Processing download, has downloads - ' . var_export( $download_files, true ) );
+	if ( empty( $download_files ) && ! in_array( $on_complete, array( 'default', 'redirect' ) ) ) {
 		$on_complete = 'default';
 	}
 
+	edd_debug_log( 'Free Downloads: Processing download with complete handler - ' . $on_complete );
+
 	switch ( $on_complete ) {
 		case 'default' :
-			$redirect_url = $success_page;
+			$redirect_url = add_query_arg( 'payment_key', $payment->key, $success_page );
 			break;
 		case 'redirect' :
-			$redirect_url = $custom_url;
+			$redirect_url = add_query_arg( 'payment_key', $payment->key, $custom_url );
 			break;
 		case 'auto-download' :
 			$redirect_url = add_query_arg( array(
@@ -296,7 +318,8 @@ function edd_free_download_process() {
 		}
 	}
 
-	wp_redirect( apply_filters( 'edd_free_downloads_redirect', add_query_arg( 'payment_key', $payment->key, $redirect_url ), $payment->ID ) );
+	edd_debug_log( 'Free Downloads: Processing download with redirect URL of - ' . $redirect_url );
+	wp_redirect( apply_filters( 'edd_free_downloads_redirect', $redirect_url, $payment->ID ) );
 	edd_die();
 }
 add_action( 'edd_free_download_process', 'edd_free_download_process' );
@@ -331,7 +354,7 @@ function edd_free_downloads_process_auto_download() {
 				if ( $archive_url && $archive_url != '' ) {
 					$download_files = array_merge( $download_files, array( basename( $archive_url ) => $archive_url ) );
 				} else {
-					if ( array_key_exists( 'item_number', $item ) ) {
+					if ( array_key_exists( 'item_number', $item ) && isset( $item['item_number']['options']['price_id'] ) ) {
 						$download_files = array_merge( $download_files, edd_free_downloads_get_files( $download_id, $item['item_number']['options']['price_id'] ) );
 					} else {
 						$download_files = array_merge( $download_files, edd_free_downloads_get_files( $download_id ) );
@@ -344,11 +367,96 @@ function edd_free_downloads_process_auto_download() {
 		$price_ids   = '';
 
 		if ( isset( $_GET['price_ids'] ) && $_GET['price_ids'] != '' ) {
-			$price_ids = sanitize_text_field( $_GET['price_ids'] );
+			$price_ids = explode( ',', trim( sanitize_text_field( $_GET['price_ids'] ) ) );
 		} else {
 			if ( edd_has_variable_prices( $download_id ) ) {
 				$price_ids = edd_get_default_variable_price( $download_id );
 			}
+		}
+
+		// If the user is logged in, it might be necessary to create a payment for this purchase.
+		if ( is_user_logged_in() ) {
+
+			/**
+			 * Getting our logged in user info
+			 *
+			 * This do_action is needed to correctly get currently logged in
+			 * user
+			 */
+			do_action( 'edd_pre_process_purchase' );
+
+			$user_id  = get_current_user_id();
+			$user     = get_userdata( $user_id );
+			$customer = new EDD_Customer( $user->data->user_email );
+
+			// Allow extensions to require a new payment record be made every time.
+			$require_new_payment = apply_filters( 'edd_free_downloads_require_new_payment', false, $download_id, $user_id, $customer );
+
+			// If multi-purchase mode is enabled and used, require a new payment.
+			if ( ! empty( $price_ids ) && count( $price_ids ) > 1 ) {
+				$require_new_payment = true;
+			}
+
+			$has_purchased = false;
+			if ( false === $require_new_payment ) {
+				$has_purchased = edd_has_user_purchased( $user_id, $download_id, $variable_price_id = null );
+			}
+
+			// If the user is already logged in, has purchased this item before and a new record isn't required, look it up.
+			if ( false === $require_new_payment && true === $has_purchased ) {
+
+				/**
+				 * The logged in user has already "purchased" this item
+				 */
+
+				global $edd_logs;
+
+				/**
+				 * The function get_connected_logs() takes an array using the same
+				 * parameters as get_posts
+				 */
+				$logs = $edd_logs->get_connected_logs( array(
+					'suppress_filters' => false,
+					'posts_per_page' => 1,
+					'fields' => 'ids',
+					'post_parent' => $download_id,
+					'meta_query' => array( array(
+						'key' => '_edd_log_payment_id',
+						'value' => explode( ',', $customer->payment_ids ),
+						'compare' => 'IN',
+					) ),
+				) );
+
+				$payment_id = get_post_meta( $logs[0], '_edd_log_payment_id', true );
+				$payment    = edd_get_payment( $payment_id );
+
+			} else {
+				/**
+				 * actually creating a payment record
+				 */
+				$payment              = new EDD_Payment();
+				$payment->user_id     = $customer->user_id;
+				$payment->user_email  = $user->data->user_email;
+				$payment->customer_id = $customer->id;
+
+				if ( is_array( $price_ids ) ) {
+					foreach ( $price_ids as $price_id ) {
+						$payment->add_download( $download_id, array(
+							'price_id'   => $price_id,
+							'item_price' => 0
+						) );
+					}
+				} else {
+					$payment->add_download( $download_id, array( 'item_price' => 0 ) );
+				}
+
+				$payment->status  = 'publish';
+				$payment->gateway = 'manual';
+				$payment->save();
+
+				$payment->add_note( __( 'Purchased through EDD Free Downloads', 'edd-free-downloads' ) );
+			}
+
 		}
 
 		$archive_url = get_post_meta( $download_id, '_edd_free_downloads_file', true );
@@ -356,9 +464,7 @@ function edd_free_downloads_process_auto_download() {
 		if ( $archive_url && $archive_url != '' ) {
 			$download_files = array_merge( $download_files, array( basename( $archive_url ) => $archive_url ) );
 		} elseif ( ! edd_is_bundled_product( $download_id ) ) {
-			if ( isset( $price_ids ) && $price_ids != '' ) {
-				$price_ids = explode( ',', trim( $price_ids ) );
-
+			if ( ! empty( $price_ids ) ) {
 				foreach ( $price_ids as $price_id ) {
 					$download_files = array_merge( $download_files, edd_free_downloads_get_files( $download_id, $price_id ) );
 				}
@@ -370,10 +476,14 @@ function edd_free_downloads_process_auto_download() {
 		}
 	}
 
-
 	$download_files = array_unique( $download_files );
 
-	if( is_array( $download_files ) && count( $download_files ) > 0 ) {
+	$on_complete        = edd_get_option( 'edd_free_downloads_on_complete', 'default' );
+	$success_page       = edd_get_success_page_uri();
+	$custom_url         = edd_get_option( 'edd_free_downloads_redirect', false );
+	$custom_url         = $custom_url ? esc_url( $custom_url ) : $success_page;
+
+	if( is_array( $download_files ) && count( $download_files ) > 0 && ( $on_complete === 'auto-download' ) ) {
 		if ( count( $download_files ) > 1 ) {
 			$download_url = edd_free_downloads_compress_files( $download_files, $download_id );
 			$download_url = str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $download_url );
@@ -395,81 +505,25 @@ function edd_free_downloads_process_auto_download() {
 		edd_free_downloads_download_file( $download_url, $hosted );
 	} else {
 
-		if ( ! is_user_logged_in() ) {
-			return;
-		}
-
 		/**
 		 * Our $download_files array is empty because there are no files and the user is logged in
 		 */
 
-		/**
-		 * Adding purchase record for logged in user.
-		 * Note the below logic will _not_ create a payment
-		 * record if the user is logged in though has already
-		 * "purchased" product.
-		 */
-
-		/**
-		 * Getting our logged in user info
-		 *
-		 * This do_action is needed to correctly get currently logged in
-		 * user
-		 */
-		do_action( 'edd_pre_process_purchase' );
-
-		$user_id = get_current_user_id();
-		$user = get_userdata( $user_id );
-
-		$customer = new EDD_Customer( $user->data->user_email );
-
-		$has_purchased = edd_has_user_purchased( $user_id, $download_id, $variable_price_id = null );
-
-		if ( true === $has_purchased ) {
-
-			/**
-			 * The logged in user has already "purchased" this item
-			 */
-
-			global $edd_logs;
-
-			/**
-			 * The function get_connected_logs() takes an array using the same
-			 * parameters as get_posts
-			 */
-			$logs = $edd_logs->get_connected_logs( array(
-				'suppress_filters' => false,
-				'posts_per_page' => 1,
-				'fields' => 'ids',
-				'post_parent' => $download_id,
-				'meta_query' => array( array(
-					'key' => '_edd_log_payment_id',
-					'value' => explode( ',', $customer->payment_ids ),
-					'compare' => 'IN',
-				) ),
-			) );
-
-			$payment_id = get_post_meta( $logs[0], '_edd_log_payment_id', true );
-			$payment = edd_get_payment( $payment_id );
-
-		} else {
-			/**
-			 * actually creating a payment record
-			 */
-			$payment              = new EDD_Payment();
-			$payment->user_id     = $customer->user_id;
-			$payment->user_email  = $user->data->user_email;
-			$payment->customer_id = $customer->id;
-
-			$payment->add_download( $download_id, array( 'price' => 0 ) );
-			$payment->status  = 'publish';
-			$payment->gateway = 'manual';
-			$payment->save();
-
-			$payment->add_note( __( 'Purchased through EDD Free Downloads', 'edd-free-downloads' ) );
+		if ( ! is_user_logged_in() ) {
+			return;
 		}
 
-		wp_safe_redirect( add_query_arg( array( 'payment_key' => $payment->key ), edd_get_success_page_uri() ) ); exit;
+		switch ( $on_complete ) {
+			case 'redirect' :
+				$redirect_url = add_query_arg( 'payment_key', $payment->key, $custom_url );
+				break;
+			case 'default' :
+			default:
+				$redirect_url = add_query_arg( 'payment_key', $payment->key, $success_page );
+				break;
+		}
+
+		wp_safe_redirect( $redirect_url ); exit;
 
 	} // End if logged in and "purchasing" a free product with no download file.
 }
