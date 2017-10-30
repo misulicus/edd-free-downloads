@@ -209,8 +209,14 @@ function edd_free_download_verify() {
 	}
 
 	if ( 'publish' !== $payment->status ) {
+
+		do_action( 'edd_free_downloads_pre_complete_payment', $payment->ID );
+
 		$payment->status = 'publish';
 		$payment->save();
+
+		do_action( 'edd_free_downloads_post_complete_payment', $payment->ID );
+
 		$payment->add_note( __( 'Free Downloads email verification complete.', 'edd-free-downloads' ) );
 	}
 
@@ -218,3 +224,38 @@ function edd_free_download_verify() {
 
 }
 add_action( 'edd_free_download_verify', 'edd_free_download_verify' );
+
+/**
+ * When Free Downloads is about to mark a payment is complete, determine what email settings should be disabled.
+ *
+ * @since 2.2.0
+ *
+ * @param  $payment
+ * @return void
+ */
+function edd_free_downloads_maybe_disable_emails( $payment ) {
+	$disable_purchase_receipts   = (bool) edd_get_option( 'edd_free_downloads_disable_emails', false );
+	$disable_admin_notifications = (bool) edd_get_option( 'edd_free_downloads_disable_admin_emails', false );
+
+	// Disable purchase receipts
+	if ( $disable_purchase_receipts ) {
+		remove_action( 'edd_complete_purchase', 'edd_trigger_purchase_receipt', 999 );
+
+		if ( function_exists( 'Receiptful' ) ) {
+			remove_action( 'edd_complete_purchase', array( Receiptful()->email, 'send_transactional_email' ) );
+		}
+
+		// Disabling purchase receipt inherently disables admin notices as well.
+		if ( ! $disable_admin_notifications ) {
+			add_action( 'edd_free_downloads_post_complete_payment',  'edd_admin_email_notice', 10, 1 );
+		}
+
+	}
+
+	// Check if admin notices should be sent, in case we are sending purchase confirmations.
+	if ( $disable_admin_notifications ) {
+		// If not, remove the action.
+		remove_action( 'edd_admin_sale_notice', 'edd_admin_email_notice', 10, 2 );
+	}
+}
+add_action( 'edd_free_downloads_pre_complete_payment', 'edd_free_downloads_maybe_disable_emails', 10, 1 );

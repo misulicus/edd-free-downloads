@@ -201,22 +201,19 @@ function edd_free_download_process() {
 		) );
 	}
 
-	// Disable purchase emails
-	if ( edd_get_option( 'edd_free_downloads_disable_emails', false ) ) {
-		remove_action( 'edd_complete_purchase', 'edd_trigger_purchase_receipt', 999 );
-
-		if ( function_exists( 'Receiptful' ) ) {
-			remove_action( 'edd_complete_purchase', array( Receiptful()->email, 'send_transactional_email' ) );
-		}
-	}
-
 	$payment->save();
 
 	// If verification is not required, go ahead and mark the payment as 'completed'.
 	$require_verification = edd_free_downloads_verify_email();
 	if ( ! $require_verification ) {
+
+		do_action( 'edd_free_downloads_pre_complete_payment', $payment->ID );
+
 		$payment->status = 'publish';
 		$payment->save();
+
+		do_action( 'edd_free_downloads_post_complete_payment', $payment->ID );
+
 	}
 	$payment->add_note( __( 'Purchased through EDD Free Downloads', 'edd-free-downloads' ) );
 
@@ -483,9 +480,14 @@ function edd_free_downloads_process_auto_download() {
 					$payment->add_download( $download_id, array( 'item_price' => 0 ) );
 				}
 
-				$payment->status  = 'publish';
+				do_action( 'edd_free_downloads_pre_complete_payment', $payment->ID );
+
 				$payment->gateway = 'manual';
+				$payment->status  = 'publish';
 				$payment->save();
+
+				do_action( 'edd_free_downloads_post_complete_payment', $payment->ID );
+
 
 				$payment->add_note( __( 'Purchased through EDD Free Downloads', 'edd-free-downloads' ) );
 			}

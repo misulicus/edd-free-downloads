@@ -235,8 +235,14 @@ function edd_free_downloads_add_settings( $settings ) {
 		),
 		array(
 			'id'   => 'edd_free_downloads_disable_emails',
-			'name' => __( 'Disable Emails', 'edd-free-downloads' ),
-			'desc' => __( 'Check to disable purchase emails for free products.', 'edd-free-downloads' ),
+			'name' => __( 'Disable purchase confirmation emails', 'edd-free-downloads' ),
+			'desc' => __( 'Checking this will disable the purchase confirmation emails which are sent to customers after they purchase a free product.', 'edd-free-downloads' ),
+			'type' => 'checkbox',
+		),
+		array(
+			'id'   => 'edd_free_downloads_disable_admin_emails',
+			'name' => __( 'Disable admin sales notifications', 'edd-free-downloads' ),
+			'desc' => sprintf( __( 'Checking this will disable the default sales notifications which get sent to the email addresses in the <a href="%s">Sale Notification Emails</a> setting.', 'edd-free-downloads' ), admin_url( 'edit.php?post_type=download&page=edd-settings&tab=emails&section=sale_notifications' ) ),
 			'type' => 'checkbox',
 		),
 		array(
