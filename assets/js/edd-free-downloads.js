@@ -271,7 +271,7 @@ jQuery(document.body).ready(function ($) {
                             password  = $('input[name="edd_free_download_pass"]');
                             password2 = $('input[name="edd_free_download_pass2"]');
 
-                            if (username.val() === '' && true === edd_free_downloads_vars.optional_fields ) {
+                            if (username.val() === '' && '1' === edd_free_downloads_vars.optional_fields ) {
 
                                     $('#edd-free-download-error-username-required').css('display', 'block');
 
@@ -281,7 +281,7 @@ jQuery(document.body).ready(function ($) {
                                 $('#edd-free-download-error-username-required').css('display', 'none');
                             }
 
-                            if (password.val() === '' && ( true === edd_free_downloads_vars.optional_fields || '' !== username.val() ) ) {
+                            if (password.val() === '' && ( '1' === edd_free_downloads_vars.optional_fields || '' !== username.val() ) ) {
 
                                     $('#edd-free-download-error-password-required').css('display', 'block');
 
@@ -291,7 +291,7 @@ jQuery(document.body).ready(function ($) {
                                 $('#edd-free-download-error-password-required').css('display', 'none');
                             }
 
-                            if (password2.val() === '' && ( true === edd_free_downloads_vars.optional_fields || '' !== username.val() ) ) {
+                            if (password2.val() === '' && ( '1' === edd_free_downloads_vars.optional_fields || '' !== username.val() ) ) {
 
                                     $('#edd-free-download-error-password2-required').css('display', 'block');
 
@@ -303,7 +303,7 @@ jQuery(document.body).ready(function ($) {
 
                             if (password.val() !== '' && password2.val() !== '') {
 
-                                if (password.val() !== password2.val()  && true === edd_free_downloads_vars.optional_fields ) {
+                                if (password.val() !== password2.val()  && '1' === edd_free_downloads_vars.optional_fields ) {
 
                                         $('#edd-free-download-error-password-unmatch').css('display', 'block');
 
