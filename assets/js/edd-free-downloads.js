@@ -16,14 +16,6 @@ jQuery(document.body).ready(function ($) {
         $( 'body' ).removeClass( 'edd-frozen' );
     }
 
-    // function eddPreventDefault( has_error, event, requireCheck ) {
-    //     console.log( 'working' );
-    //     console.log( 'requireCheck: ' + requireCheck );
-
-    //     has_error++;
-    //     event.preventDefault();
-    // }
-
     if ($('input[name="edd_options[price_id][]"]').length > 0) {
         var classes, wrapperPrefix, linkPrefix, linkSuffix, wrapperSuffix, href;
 
