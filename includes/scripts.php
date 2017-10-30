@@ -11,8 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'EDD_FREE_DOWNLOADS_SCRIPT_DEBUG', true );
-
 /**
  * Load scripts
  *
@@ -20,7 +18,6 @@ define( 'EDD_FREE_DOWNLOADS_SCRIPT_DEBUG', true );
  * @return      void
  */
 function edd_free_downloads_scripts() {
-
 	/**
 	 * Safari does not seem to load these style for logged
 	 * out users on occasion. Here we are using the same handle

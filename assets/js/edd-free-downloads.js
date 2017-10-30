@@ -3,8 +3,6 @@
 jQuery(document.body).ready(function ($) {
     'use strict';
 
-    console.log( JSON.stringify( edd_free_downloads_vars, null, "\t" ) );
-
     var body = $(document.body);
     /**
      * This function controls the closing of the modal by either
@@ -249,8 +247,6 @@ jQuery(document.body).ready(function ($) {
                             } // End checking last name
 
                         } // End true check on required_name
-
-
 
                         /**
                          * If edd_free_downloads_vars.optional_fields is empty then
