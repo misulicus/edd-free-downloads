@@ -11,6 +11,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+define( 'EDD_FREE_DOWNLOADS_SCRIPT_DEBUG', true );
+
 /**
  * Load scripts
  *
@@ -18,6 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return      void
  */
 function edd_free_downloads_scripts() {
+
 	/**
 	 * Safari does not seem to load these style for logged
 	 * out users on occasion. Here we are using the same handle
@@ -25,7 +28,7 @@ function edd_free_downloads_scripts() {
 	 */
 	wp_enqueue_style( 'dashicons', site_url( '/wp-includes/css/dashicons.min.css' ) );
 
-	$suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+	$suffix = ( defined( 'EDD_FREE_DOWNLOADS_SCRIPT_DEBUG' ) && EDD_FREE_DOWNLOADS_SCRIPT_DEBUG ) ? '' : '.min';
 
 	wp_register_script( 'edd-free-downloads-mobile', EDD_FREE_DOWNLOADS_URL . 'assets/js/isMobile'. $suffix . '.js', array( 'jquery' ) );
 	wp_enqueue_script( 'edd-free-downloads-mobile' );
@@ -37,9 +40,10 @@ function edd_free_downloads_scripts() {
 	wp_enqueue_script( 'edd-free-downloads' );
 
 	// Localize some settings for use in Javascript.
-	$close_button   = edd_get_option( 'edd_free_downloads_close_button', false );
-	$close_button   = ( $close_button ? 'box' : 'overlay' );
-	$download_label = edd_get_option( 'edd_free_downloads_button_label', __( 'Download Now', 'edd-free-downloads' ) );
+	$close_button    = edd_get_option( 'edd_free_downloads_close_button', false );
+	$close_button    = ( $close_button ? 'box' : 'overlay' );
+	$download_label  = edd_get_option( 'edd_free_downloads_button_label', __( 'Download Now', 'edd-free-downloads' ) );
+	$optional_fields = edd_no_guest_checkout();
 
 	wp_localize_script( 'edd-free-downloads', 'edd_free_downloads_vars', array(
 		'close_button'         => $close_button,
@@ -56,6 +60,7 @@ function edd_free_downloads_scripts() {
 		'is_download'          => ( is_singular( 'download' ) ? 'true' : 'false' ),
 		'edd_is_mobile'        => wp_is_mobile(),
 		'success_page'         => edd_get_success_page_uri(),
+		'optional_fields'      => $optional_fields,
 	) );
 }
 add_action( 'wp_enqueue_scripts', 'edd_free_downloads_scripts' );
