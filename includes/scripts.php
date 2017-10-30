@@ -56,6 +56,7 @@ function edd_free_downloads_scripts() {
 		'is_download'          => ( is_singular( 'download' ) ? 'true' : 'false' ),
 		'edd_is_mobile'        => wp_is_mobile(),
 		'success_page'         => edd_get_success_page_uri(),
+		'email_verification'   => edd_free_downloads_verify_email(),
 	) );
 }
 add_action( 'wp_enqueue_scripts', 'edd_free_downloads_scripts' );

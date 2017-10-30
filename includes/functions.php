@@ -12,7 +12,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-
 /**
  * Setup form fields
  *
@@ -457,7 +456,7 @@ function edd_free_downloads_set_download_method( $method ) {
  * @param       string $file_path The path to check
  * @return      string $hosted The hosting location
  */
-	function edd_free_downloads_get_host( $file_path ) {
+function edd_free_downloads_get_host( $file_path ) {
 	$hosted = '';
 
 	if ( strpos( $file_path, site_url() ) !== false ) {

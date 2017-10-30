@@ -290,19 +290,38 @@ jQuery(document.body).ready(function ($) {
                         }
 
                         if (has_error === 0) {
-                            $('#edd_free_download_form').submit();
-                            $('.edd-free-download-submit span').html(edd_free_downloads_vars.download_loading);
-                            $('.edd-free-download-submit span').append('<i class="edd-icon-spinner edd-icon-spin"></i>');
-                            $('.edd-free-download-submit').attr('disabled', 'disabled');
-
-                            eddFreeDownloadCloseModal();
+                            if ( edd_free_downloads_vars.email_verification === '1' ) {
+                                e.preventDefault();
+                                var data = $('#edd_free_download_form').serialize();
+                                $.ajax({
+                                    url      : edd_free_downloads_vars.ajaxurl,
+                                    type     : 'POST',
+                                    data     : data,
+                                    success: function (response) {
+                                        $('.edd-free-downloads-verification-message').html(response.message).fadeIn();
+                                        $('.edd-free-downloads-verification-message-wrapper').removeClass('edd-alert-info');
+                                        if ( response.success ) {
+                                            $('.edd-free-downloads-verification-message-wrapper').addClass('edd-alert-success', 250);
+                                            $('.edd-free-download-submit').hide();
+                                        } else {
+                                            $('.edd-free-downloads-verification-message-wrapper').addClass('edd-alert-error', 250);
+                                        }
+                                    }
+                                });
+                            } else {
+                                $('#edd_free_download_form').submit();
+                                $('.edd-free-download-submit span').html(edd_free_downloads_vars.download_loading);
+                                $('.edd-free-download-submit span').append('<i class="edd-icon-spinner edd-icon-spin"></i>');
+                                $('.edd-free-download-submit').attr('disabled', 'disabled');
+                                eddFreeDownloadCloseModal();
+                            }
                         } else {
                             $('.edd-free-download-errors').css('display', 'block');
                             $('.edd-free-download-submit').removeAttr('disabled');
                             e.preventDefault();
                         }
 
-                    } ); // End validation checks
+                    }); // End validation checks
 
                     $( '#edd-free-downloads-modal' ).on( 'click', 'a.edd-free-downloads-direct-download-link', function( e ) {
                         e.preventDefault();
