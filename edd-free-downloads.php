@@ -1,15 +1,15 @@
 <?php
 /**
  * Plugin Name:     Easy Digital Downloads - Free Downloads
- * Plugin URI:      https://easydigitaldownloads.com/extensions/free-downloads/
+ * Plugin URI:      https://easydigitaldownloads.com/downloads/free-downloads/
  * Description:     Adds better handling for directly downloading free products to EDD
- * Version:         2.1.9
- * Author:          Daniel J Griffiths
- * Author URI:      http://section214.com
+ * Version:         2.2.0-beta1
+ * Author:          Easy Digital Downloads
+ * Author URI:      https://easydigitaldownloads.com
  * Text Domain:     edd-free-downloads
  *
  * @package         EDD\FreeDownloads
- * @author          Daniel J Griffiths <dgriffiths@section214.com>
+ * @author          Easy Digital Downloads, LLC
  */
 
 
@@ -66,7 +66,7 @@ if ( ! class_exists( 'EDD_Free_Downloads' ) ) {
 		 */
 		private function setup_constants() {
 			// Plugin version
-			define( 'EDD_FREE_DOWNLOADS_VER', '2.1.9' );
+			define( 'EDD_FREE_DOWNLOADS_VER', '2.2.0-beta1' );
 
 			// Plugin path
 			define( 'EDD_FREE_DOWNLOADS_DIR', plugin_dir_path( __FILE__ ) );
@@ -115,7 +115,7 @@ if ( ! class_exists( 'EDD_Free_Downloads' ) ) {
 		private function hooks() {
 			// Handle licensing
 			if ( class_exists( 'EDD_License' ) ) {
-				$license = new EDD_License( __FILE__, 'Free Downloads', EDD_FREE_DOWNLOADS_VER, 'Daniel J Griffiths' );
+				$license = new EDD_License( __FILE__, 'Free Downloads', EDD_FREE_DOWNLOADS_VER, 'Easy Digital Downloads' );
 			}
 		}
 

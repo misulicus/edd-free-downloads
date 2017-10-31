@@ -3,14 +3,14 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Easy Digital Downloads - Free Downloads\n"
-"POT-Creation-Date: 2016-10-07 13:35+0200\n"
+"POT-Creation-Date: 2017-10-31 10:28-0700\n"
 "PO-Revision-Date: 2016-10-07 13:35+0200\n"
 "Last-Translator: FX Bénard <fx@fxbenard.com>\n"
 "Language-Team: FX Bénard <fx@fxbenard.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.9\n"
+"X-Generator: Poedit 2.0.2\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-WPHeader: edd-free-downloads.php\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -20,27 +20,33 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 
-#: includes/actions.php:124
+#: edd-free-downloads.php:183
+msgid ""
+"Free Downloads requires Easy Digital Downloads! Please install or activate "
+"it to continue!"
+msgstr ""
+
+#: includes/actions.php:133
 msgid "Available"
 msgstr ""
 
-#: includes/actions.php:125 includes/actions.php:128
-#: includes/admin/settings/register.php:182
+#: includes/actions.php:134 includes/actions.php:137
+#: includes/admin/settings/register.php:263
 msgid "Compression Status"
 msgstr ""
 
-#: includes/actions.php:125
+#: includes/actions.php:134
 #, php-format
 msgid ""
 "Great! It looks like you have the ZipArchive class available! That means "
 "that we can auto-compress the files for multi-file %s."
 msgstr ""
 
-#: includes/actions.php:127
+#: includes/actions.php:136
 msgid "Unavailable"
 msgstr ""
 
-#: includes/actions.php:128
+#: includes/actions.php:137
 #, php-format
 msgid ""
 "Oops! It looks like you don't have the ZipArchive class available! If you "
@@ -48,12 +54,12 @@ msgid ""
 "your PHP instance is compiled with ZipArchive support."
 msgstr ""
 
-#: includes/actions.php:178 includes/actions.php:179
-#: includes/admin/settings/register.php:207
+#: includes/actions.php:187 includes/actions.php:188
+#: includes/admin/settings/register.php:299
 msgid "Purge Cache"
 msgstr ""
 
-#: includes/actions.php:179
+#: includes/actions.php:188
 msgid ""
 "This will purge all files currently cached by Free Downloads. This does not "
 "affect any files hosted locally, it only clears the local copies of remotely "
@@ -61,25 +67,25 @@ msgid ""
 "auto download."
 msgstr ""
 
-#: includes/actions.php:194 includes/actions.php:226
+#: includes/actions.php:203 includes/actions.php:235
 msgid "Nonce verification failed!"
 msgstr ""
 
-#: includes/actions.php:194 includes/actions.php:222 includes/actions.php:226
-#: includes/download-actions.php:25 includes/download-actions.php:29
-#: includes/download-actions.php:33 includes/download-actions.php:46
-#: includes/download-actions.php:50 includes/download-actions.php:57
-#: includes/download-actions.php:61 includes/download-actions.php:63
-#: includes/download-actions.php:69 includes/download-actions.php:78
-#: includes/download-actions.php:83 includes/download-actions.php:88
-#: includes/download-actions.php:95 includes/download-actions.php:99
-#: includes/download-actions.php:104 includes/download-actions.php:134
-#: includes/download-actions.php:158 includes/functions.php:206
-#: includes/functions.php:243
+#: includes/actions.php:203 includes/actions.php:231 includes/actions.php:235
+#: includes/download-actions.php:26 includes/download-actions.php:30
+#: includes/download-actions.php:34 includes/download-actions.php:49
+#: includes/download-actions.php:54 includes/download-actions.php:61
+#: includes/download-actions.php:65 includes/download-actions.php:67
+#: includes/download-actions.php:73 includes/download-actions.php:84
+#: includes/download-actions.php:92 includes/download-actions.php:100
+#: includes/download-actions.php:109 includes/download-actions.php:116
+#: includes/download-actions.php:124 includes/download-actions.php:162
+#: includes/download-actions.php:181 includes/download-actions.php:196
+#: includes/functions.php:294 includes/functions.php:332
 msgid "Oops!"
 msgstr ""
 
-#: includes/actions.php:222
+#: includes/actions.php:231
 msgid "No download specified!"
 msgstr ""
 
@@ -198,9 +204,9 @@ msgid ""
 msgstr ""
 
 #: includes/admin/settings/register.php:52
-#: includes/admin/settings/register.php:59 includes/filters.php:83
-#: includes/scripts.php:25 includes/scripts.php:38
-#: templates/download-modal.php:18 templates/download-redirect.php:18
+#: includes/admin/settings/register.php:59 includes/filters.php:84
+#: includes/scripts.php:42 includes/scripts.php:51
+#: templates/download-modal.php:23 templates/download-redirect.php:35
 msgid "Download Now"
 msgstr ""
 
@@ -315,250 +321,487 @@ msgid ""
 msgstr ""
 
 #: includes/admin/settings/register.php:138
-#: includes/admin/settings/register.php:141
-msgid "On-Complete Handler"
+msgid "Require Email Verification"
 msgstr ""
 
 #: includes/admin/settings/register.php:139
+msgid ""
+"Requires users to receive an email and follow a link in order to complete "
+"their download."
+msgstr ""
+
+#: includes/admin/settings/register.php:144
+msgid "Email Verification Message"
+msgstr ""
+
+#: includes/admin/settings/register.php:145
+msgid ""
+"Define the message to show to visitors letting them know they will receive "
+"an email to verify their download."
+msgstr ""
+
+#: includes/admin/settings/register.php:147 includes/emails.php:102
+msgid ""
+"An email will be sent to the provided address to complete your download."
+msgstr ""
+
+#: includes/admin/settings/register.php:152
+msgid "Verification Email Subject"
+msgstr ""
+
+#: includes/admin/settings/register.php:153
+msgid "The subject line for the email sent to the user."
+msgstr ""
+
+#: includes/admin/settings/register.php:155 includes/emails.php:113
+msgid "Confirm your free download."
+msgstr ""
+
+#: includes/admin/settings/register.php:160
+msgid "Verification Email"
+msgstr ""
+
+#: includes/admin/settings/register.php:161
+msgid ""
+"Enter in the content of the email you want to send to verify email addresses."
+msgstr ""
+
+#: includes/admin/settings/register.php:163 includes/emails.php:124
+msgid ""
+"Please click the following link to complete your download.\n"
+"\n"
+"{free_downloads_verification_link}"
+msgstr ""
+
+#: includes/admin/settings/register.php:168
+#: includes/admin/settings/register.php:171
+msgid "On-Complete Handler"
+msgstr ""
+
+#: includes/admin/settings/register.php:169
+#: includes/admin/settings/register.php:194
 msgid "Specify what to do once the user has filled out the download form."
 msgstr ""
 
-#: includes/admin/settings/register.php:142
+#: includes/admin/settings/register.php:172
 msgid "Free Downloads can do a number of things when a download is processed:"
 msgstr ""
 
-#: includes/admin/settings/register.php:143
+#: includes/admin/settings/register.php:173
 msgid "Display Purchase Confirmation:"
 msgstr ""
 
-#: includes/admin/settings/register.php:143
+#: includes/admin/settings/register.php:173
 msgid ""
 "This is the default behavior of EDD. Users will be redirected to the same "
 "Purchase Confirmation page they would see when completing a purchase."
 msgstr ""
 
-#: includes/admin/settings/register.php:144
+#: includes/admin/settings/register.php:174
 msgid "Auto Download:"
 msgstr ""
 
-#: includes/admin/settings/register.php:144
+#: includes/admin/settings/register.php:174
 msgid ""
 "The system will close the download modal, and automatically download the "
 "relevant file(s)."
 msgstr ""
 
-#: includes/admin/settings/register.php:145
+#: includes/admin/settings/register.php:175
 msgid "Custom Redirect:"
 msgstr ""
 
-#: includes/admin/settings/register.php:145
+#: includes/admin/settings/register.php:175
 msgid ""
 "Rather than redirecting to the Purchase Confirmation page, this allows you "
 "to define a custom redirection URL."
 msgstr ""
 
-#: includes/admin/settings/register.php:148
+#: includes/admin/settings/register.php:178
+#: includes/admin/settings/register.php:201
+#: includes/admin/settings/register.php:224
 msgid "Display Purchase Confirmation"
 msgstr ""
 
-#: includes/admin/settings/register.php:149
+#: includes/admin/settings/register.php:179
+#: includes/admin/settings/register.php:202
 msgid "Auto Download"
 msgstr ""
 
-#: includes/admin/settings/register.php:150
+#: includes/admin/settings/register.php:180
+#: includes/admin/settings/register.php:203
+#: includes/admin/settings/register.php:225
 msgid "Custom Redirect"
 msgstr ""
 
-#: includes/admin/settings/register.php:155
-#: includes/admin/settings/register.php:158
+#: includes/admin/settings/register.php:185
+#: includes/admin/settings/register.php:188
 msgid "Redirect URL"
 msgstr ""
 
-#: includes/admin/settings/register.php:156
+#: includes/admin/settings/register.php:186
 msgid "Enter a URL to redirect to on completion."
 msgstr ""
 
-#: includes/admin/settings/register.php:159
+#: includes/admin/settings/register.php:189
+#: includes/admin/settings/register.php:212
+#: includes/admin/settings/register.php:234
 msgid ""
 "If no URL is set, users will be automatically redirected to the Purchase "
 "Confirmation page."
 msgstr ""
 
-#: includes/admin/settings/register.php:163
-msgid "Disable Emails"
+#: includes/admin/settings/register.php:193
+#: includes/admin/settings/register.php:196
+msgid "Mobile On-Complete Handler"
 msgstr ""
 
-#: includes/admin/settings/register.php:164
-msgid "Check to disable purchase emails for free products."
+#: includes/admin/settings/register.php:197
+msgid "Specify an alternate method of handling completion on mobile devices."
 msgstr ""
 
-#: includes/admin/settings/register.php:169
+#: includes/admin/settings/register.php:200
+#: includes/admin/settings/register.php:223
+msgid "Use Main On-Complete Handler"
+msgstr ""
+
+#: includes/admin/settings/register.php:208
+#: includes/admin/settings/register.php:211
+msgid "Mobile Redirect URL"
+msgstr ""
+
+#: includes/admin/settings/register.php:209
+msgid "Enter a URL to redirect to on completion for mobile devices."
+msgstr ""
+
+#: includes/admin/settings/register.php:216
+#: includes/admin/settings/register.php:219
+msgid "Apple On-Complete Handler"
+msgstr ""
+
+#: includes/admin/settings/register.php:217
+msgid ""
+"Apple does not allow automatic downloads. Specify an alternative for Apple "
+"devices."
+msgstr ""
+
+#: includes/admin/settings/register.php:220
+msgid ""
+"Specify an alternate method of handling completion on Apple mobile devices."
+msgstr ""
+
+#: includes/admin/settings/register.php:230
+#: includes/admin/settings/register.php:233
+msgid "Apple Redirect URL"
+msgstr ""
+
+#: includes/admin/settings/register.php:231
+msgid "Enter a URL to redirect to on completion for Apple devices."
+msgstr ""
+
+#: includes/admin/settings/register.php:238
+msgid "Disable purchase confirmation emails"
+msgstr ""
+
+#: includes/admin/settings/register.php:239
+msgid ""
+"Checking this will disable the purchase confirmation emails which are sent "
+"to customers after they purchase a free product."
+msgstr ""
+
+#: includes/admin/settings/register.php:244
+msgid "Disable admin sales notifications"
+msgstr ""
+
+#: includes/admin/settings/register.php:245
+#, php-format
+msgid ""
+"Checking this will disable the default sales notifications which get sent to "
+"the email addresses in the <a href=\"%s\">Sale Notification Emails</a> "
+"setting."
+msgstr ""
+
+#: includes/admin/settings/register.php:250
 msgid "Direct Download"
 msgstr ""
 
-#: includes/admin/settings/register.php:170
+#: includes/admin/settings/register.php:251
 msgid "Check to allow users to download files without entering their info."
 msgstr ""
 
-#: includes/admin/settings/register.php:175
+#: includes/admin/settings/register.php:256
 msgid "Direct Download Label"
 msgstr ""
 
-#: includes/admin/settings/register.php:176
+#: includes/admin/settings/register.php:257
 msgid "Enter the text to display for the direct download link"
 msgstr ""
 
-#: includes/admin/settings/register.php:178 templates/download-modal.php:112
-#: templates/download-redirect.php:113
+#: includes/admin/settings/register.php:259 templates/download-modal.php:209
+#: templates/download-redirect.php:163
 msgid "No thanks, proceed to download"
 msgstr ""
 
-#: includes/admin/settings/register.php:191
-#: includes/admin/settings/register.php:194
+#: includes/admin/settings/register.php:272
+#: includes/admin/settings/register.php:275
 msgid "Cache Settings"
 msgstr ""
 
-#: includes/admin/settings/register.php:195
+#: includes/admin/settings/register.php:276
 msgid ""
 "The fields below define how Free Downloads handles file caching. Free "
 "Downloads caches files which are stored remotely while compressing them if "
 "direct download or auto download are enabled."
 msgstr ""
 
-#: includes/admin/settings/register.php:199
-#: includes/admin/settings/register.php:202
+#: includes/admin/settings/register.php:280
+#: includes/admin/settings/register.php:283
 msgid "Disable Cache"
 msgstr ""
 
-#: includes/admin/settings/register.php:200
+#: includes/admin/settings/register.php:281
 msgid "Check to disable caching remote files entirely."
 msgstr ""
 
-#: includes/admin/settings/register.php:203
+#: includes/admin/settings/register.php:284
 msgid ""
 "Free Downloads caches remote files to prevent long download times while "
 "compressing multi-file downloads. If you prefer not to use this feature, "
 "check this option."
 msgstr ""
 
-#: includes/admin/settings/register.php:220
-#: includes/admin/settings/register.php:223
+#: includes/admin/settings/register.php:288
+#: includes/admin/settings/register.php:294
+msgid "Cache Timeout"
+msgstr ""
+
+#: includes/admin/settings/register.php:289
+msgid "Enter the length of the cache timeout, in hours."
+msgstr ""
+
+#: includes/admin/settings/register.php:295
+msgid ""
+"If a cached file is requested, Free Downloads will see when it was created. "
+"If that time is greater than this cache timeout, the file will be recreated."
+msgstr ""
+
+#: includes/admin/settings/register.php:312
+#: includes/admin/settings/register.php:315
 msgid "Integration Settings"
 msgstr ""
 
-#: includes/admin/settings/register.php:224
+#: includes/admin/settings/register.php:316
 msgid ""
 "The fields below define how Free Downloads integrates with other plugins you "
 "have installed."
 msgstr ""
 
-#: includes/admin/settings/register.php:255
+#: includes/admin/settings/register.php:347
 msgid "User Registration"
 msgstr ""
 
-#: includes/admin/settings/register.php:256
+#: includes/admin/settings/register.php:348
 msgid ""
 "Check to display a registration form in the download modal for logged-out "
 "users."
 msgstr ""
 
-#: includes/admin/settings/register.php:266
-#: includes/admin/settings/register.php:269
+#: includes/admin/settings/register.php:358
+#: includes/admin/settings/register.php:361
 msgid "Bypass Auto Registration"
 msgstr ""
 
-#: includes/admin/settings/register.php:267
+#: includes/admin/settings/register.php:359
 msgid "Check to bypass auto-registration for free downloads."
 msgstr ""
 
-#: includes/admin/settings/register.php:270
+#: includes/admin/settings/register.php:362
 msgid ""
 "By default, the Auto Registration plugin registers a new user account when a "
 "free download is processed. Check this to prevent user accounts from being "
 "automatically created."
 msgstr ""
 
-#: includes/admin/settings/register.php:294
+#: includes/admin/settings/register.php:386
 msgid "Display Opt-In"
 msgstr ""
 
-#: includes/admin/settings/register.php:295
+#: includes/admin/settings/register.php:387
 msgid "Check to display a newsletter opt-in checkbox in the download modal."
 msgstr ""
 
-#: includes/admin/settings/register.php:300
+#: includes/admin/settings/register.php:392
 msgid "Opt-In Field Label"
 msgstr ""
 
-#: includes/admin/settings/register.php:301
+#: includes/admin/settings/register.php:393
 msgid "Specify the text to display for the opt-in field label."
 msgstr ""
 
-#: includes/admin/settings/register.php:303 templates/download-modal.php:67
-#: templates/download-redirect.php:67
+#: includes/admin/settings/register.php:395 templates/download-modal.php:111
+#: templates/download-redirect.php:101
 msgid "Subscribe to our newsletter"
 msgstr ""
 
-#: includes/download-actions.php:25
+#: includes/download-actions.php:26
 msgid "Bad spammer, no download!"
 msgstr ""
 
-#: includes/download-actions.php:29
+#: includes/download-actions.php:30
 msgid "Cheatin&#8217; huh?"
 msgstr ""
 
-#: includes/download-actions.php:33 includes/download-actions.php:78
-#: includes/download-actions.php:83 includes/download-actions.php:88
-#: includes/download-actions.php:95 includes/download-actions.php:99
-#: includes/download-actions.php:104 includes/download-actions.php:134
-#: includes/download-actions.php:158
-msgid "An internal error has occurred, please try again or contact support."
+#: includes/download-actions.php:34
+msgid ""
+"An internal error has occurred, please try again or contact support. Email "
+"address not provided."
 msgstr ""
 
-#: includes/download-actions.php:46
+#: includes/download-actions.php:49
 msgid "The username and password fields are required, please try again."
 msgstr ""
 
-#: includes/download-actions.php:50
+#: includes/download-actions.php:54
 msgid ""
 "Password and password confirmation fields don't match, please try again,"
 msgstr ""
 
-#: includes/download-actions.php:57
+#: includes/download-actions.php:61
 msgid "The specified username already exists, please log in or try again."
 msgstr ""
 
-#: includes/download-actions.php:61
+#: includes/download-actions.php:65
 msgid "Invalid username. Only lowercase letters (a-z) and numbers are allowed."
 msgstr ""
 
-#: includes/download-actions.php:63
+#: includes/download-actions.php:67
 msgid "Invalid username."
 msgstr ""
 
-#: includes/download-actions.php:69
+#: includes/download-actions.php:73
 msgid "The specified email has already been used, please log in or try again."
 msgstr ""
 
-#: includes/download-actions.php:204
+#: includes/download-actions.php:84
+msgid "Please enter a valid email address."
+msgstr ""
+
+#: includes/download-actions.php:92
+msgid ""
+"Your email address or domain is not allowed to download content. Please "
+"contact support if you feel this is an error."
+msgstr ""
+
+#: includes/download-actions.php:100
+msgid ""
+"An internal error has occurred, please try again or contact support. "
+"$download_id is empty"
+msgstr ""
+
+#: includes/download-actions.php:109
+msgid ""
+"An internal error has occurred, please try again or contact support. "
+"Download is not a valid object"
+msgstr ""
+
+#: includes/download-actions.php:116
+msgid ""
+"An internal error has occurred, please try again or contact support. Invalid "
+"object type"
+msgstr ""
+
+#: includes/download-actions.php:124
+msgid ""
+"An internal error has occurred, please try again or contact support. User "
+"does not have access to this download or the download is not available"
+msgstr ""
+
+#: includes/download-actions.php:162 includes/download-actions.php:181
+msgid ""
+"The requested product is not a free product! Please try again or contact "
+"support."
+msgstr ""
+
+#: includes/download-actions.php:196
+msgid ""
+"An internal error has occurred, please try again or contact support. Invalid "
+"item."
+msgstr ""
+
+#: includes/download-actions.php:218 includes/download-actions.php:491
 msgid "Purchased through EDD Free Downloads"
 msgstr ""
 
-#: includes/filters.php:84
-msgid "Add to Cart"
+#: includes/download-actions.php:242
+msgid "Your email has been successfully sent."
+msgstr ""
+
+#: includes/download-actions.php:244
+#, php-format
+msgid "Free Downloads verification sent to %s."
+msgstr ""
+
+#: includes/download-actions.php:247
+msgid "Your email failed to send, please try again."
+msgstr ""
+
+#: includes/download-actions.php:249
+#, php-format
+msgid "Free Downloads verification failed to send to %s."
+msgstr ""
+
+#: includes/download-actions.php:270
+msgid "Error completing download request"
+msgstr ""
+
+#: includes/emails.php:22
+msgid "Insert the free downloads confirmation link"
+msgstr ""
+
+#: includes/emails.php:23
+msgid "Insert the name of the item delivered via Free Downloads"
+msgstr ""
+
+#: includes/emails.php:195
+#, php-format
+msgid "Error processing download of <a href=\"%s\">%s</a>"
+msgstr ""
+
+#: includes/emails.php:200
+msgid "Error processing download. Please contact support."
+msgstr ""
+
+#: includes/emails.php:203
+msgid "Error"
+msgstr ""
+
+#: includes/emails.php:208
+msgid "Validation failed."
+msgstr ""
+
+#: includes/emails.php:208
+msgid "Validation error"
+msgstr ""
+
+#: includes/emails.php:220
+msgid "Free Downloads email verification complete."
 msgstr ""
 
 #: includes/filters.php:85
-msgid "Purchase"
+msgid "Add to Cart"
 msgstr ""
 
 #: includes/filters.php:86
+msgid "Purchase"
+msgstr ""
+
+#: includes/filters.php:87
 msgid "Buy Now"
 msgstr ""
 
-#: includes/functions.php:27 templates/download-modal.php:24
-#: templates/download-modal.php:25 templates/download-redirect.php:24
-#: templates/download-redirect.php:25
+#: includes/functions.php:26 templates/download-modal.php:42
+#: templates/download-modal.php:43 templates/download-redirect.php:43
+#: templates/download-redirect.php:44
 msgid "Email Address"
 msgstr ""
 
@@ -594,50 +837,42 @@ msgstr ""
 msgid "Password and password confirmation do not match"
 msgstr ""
 
-#: includes/functions.php:206 includes/functions.php:243
+#: includes/functions.php:294 includes/functions.php:332
 msgid "An unknown error occurred, please try again!"
 msgstr ""
 
-#: includes/libraries/class.s214-edd-activation.php:79
-msgid " requires Easy Digital Downloads! Please activate it to continue!"
-msgstr ""
-
-#: includes/libraries/class.s214-edd-activation.php:81
-msgid " requires Easy Digital Downloads! Please install it to continue!"
-msgstr ""
-
-#: includes/scripts.php:36
+#: includes/scripts.php:49
 msgid "Please Wait... "
 msgstr ""
 
-#: templates/download-modal.php:30 templates/download-modal.php:31
-#: templates/download-redirect.php:30 templates/download-redirect.php:31
+#: templates/download-modal.php:48 templates/download-modal.php:53
+#: templates/download-redirect.php:49 templates/download-redirect.php:50
 msgid "First Name"
 msgstr ""
 
-#: templates/download-modal.php:35 templates/download-modal.php:36
-#: templates/download-redirect.php:35 templates/download-redirect.php:36
+#: templates/download-modal.php:58 templates/download-modal.php:63
+#: templates/download-redirect.php:54 templates/download-redirect.php:55
 msgid "Last Name"
 msgstr ""
 
-#: templates/download-modal.php:46 templates/download-modal.php:47
-#: templates/download-redirect.php:46 templates/download-redirect.php:47
+#: templates/download-modal.php:75 templates/download-modal.php:80
+#: templates/download-redirect.php:69 templates/download-redirect.php:71
 msgid "Username"
 msgstr ""
 
-#: templates/download-modal.php:51 templates/download-redirect.php:51
+#: templates/download-modal.php:85 templates/download-redirect.php:79
 msgid "Password"
 msgstr ""
 
-#: templates/download-modal.php:56 templates/download-redirect.php:56
+#: templates/download-modal.php:95 templates/download-redirect.php:89
 msgid "Confirm Password"
 msgstr ""
 
-#: templates/download-modal.php:100 templates/download-redirect.php:100
+#: templates/download-modal.php:151 templates/download-redirect.php:150
 msgid "Error:"
 msgstr ""
 
-#: templates/download-redirect.php:109
+#: templates/download-redirect.php:159
 msgid "Cancel"
 msgstr ""
 
@@ -646,7 +881,7 @@ msgid "Easy Digital Downloads - Free Downloads"
 msgstr ""
 
 #. Plugin URI of the plugin/theme
-msgid "https://easydigitaldownloads.com/extensions/free-downloads/"
+msgid "https://easydigitaldownloads.com/downloads/free-downloads/"
 msgstr ""
 
 #. Description of the plugin/theme
@@ -654,9 +889,9 @@ msgid "Adds better handling for directly downloading free products to EDD"
 msgstr ""
 
 #. Author of the plugin/theme
-msgid "Daniel J Griffiths"
+msgid "Easy Digital Downloads"
 msgstr ""
 
 #. Author URI of the plugin/theme
-msgid "http://section214.com"
+msgid "https://easydigitaldownloads.com"
 msgstr ""
