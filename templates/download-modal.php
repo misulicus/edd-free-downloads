@@ -9,6 +9,7 @@ $desktop_redirect     = edd_get_option( 'edd_free_downloads_redirect' );
 $mobile_redirect      = edd_get_option( 'edd_free_downloads_mobile_redirect' );
 $is_mobile            = $_GET['edd_is_mobile'] ? true : false;
 $require_verification = edd_free_downloads_verify_email();
+$require_login        = edd_no_guest_checkout();
 
 $email = isset( $user ) ? $user->user_email : '';
 $fname = isset( $user ) ? $user->user_firstname : '';
@@ -71,19 +72,31 @@ $price_ids = isset( $_GET['price_ids'] ) ? array_map( 'absint', $_GET['price_ids
 		<?php do_action( 'edd_free_downloads_before_modal_form_registration', $post ); ?>
 
 		<p>
-			<label for="edd_free_download_username" class="edd-free-downloads-label"><?php esc_html_e( 'Username', 'edd-free-downloads' ); ?> <span class="edd-free-downloads-required">*</span></label>
+			<label for="edd_free_download_username" class="edd-free-downloads-label"><?php esc_html_e( 'Username', 'edd-free-downloads' ); ?>
+				<?php if ( $require_login ) : ?>
+					<span class="edd-free-downloads-required">*</span>
+				<?php endif; ?>
+			</label>
 			<input type="text" name="edd_free_download_username" id="edd_free_download_username" class="edd-free-download-field" placeholder="<?php _e( 'Username', 'edd-free-downloads' ); ?>" value="" tabindex="0" />
 			<?php do_action( 'edd_free_downloads_after_modal_username', $post ); ?>
 		</p>
 
 		<p>
-			<label for="edd_free_download_pass" class="edd-free-downloads-label"><?php esc_html_e( 'Password', 'edd-free-downloads' ); ?> <span class="edd-free-downloads-required">*</span></label>
+			<label for="edd_free_download_pass" class="edd-free-downloads-label"><?php esc_html_e( 'Password', 'edd-free-downloads' ); ?>
+				<?php if ( $require_login ) : ?>
+					<span class="edd-free-downloads-required">*</span>
+				<?php endif; ?>
+			</label>
 			<input type="password" name="edd_free_download_pass" id="edd_free_download_pass" class="edd-free-download-field" tabindex="0" />
 			<?php do_action( 'edd_free_downloads_after_modal_pass', $post ); ?>
 		</p>
 
 		<p>
-			<label for="edd_free_download_pass2" class="edd-free-downloads-label"><?php esc_html_e( 'Confirm Password', 'edd-free-downloads' ); ?> <span class="edd-free-downloads-required">*</span></label>
+			<label for="edd_free_download_pass2" class="edd-free-downloads-label"><?php esc_html_e( 'Confirm Password', 'edd-free-downloads' ); ?>
+				<?php if ( $require_login ) : ?>
+					<span class="edd-free-downloads-required">*</span>
+				<?php endif; ?>
+			</label>
 			<input type="password" name="edd_free_download_pass2" id="edd_free_download_pass2" class="edd-free-download-field" tabindex="0" />
 			<?php do_action( 'edd_free_downloads_after_modal_pass_2', $post ); ?>
 		</p>
