@@ -373,11 +373,10 @@ function edd_free_downloads_process_auto_download() {
 	$download_files = array();
 
 	if ( isset( $_GET['payment-id'] ) ) {
-		$payment_meta = edd_get_payment_meta( $_GET['payment-id'] );
-		$cart         = edd_get_payment_meta_cart_details( $_GET['payment-id'], true );
+		$payment = edd_get_payment( intval( $_GET['payment-id'] ) );
 
-		if ( $cart ) {
-			foreach ( $cart as $key => $item ) {
+		if ( ! empty( $payment->cart_details ) ) {
+			foreach ( $payment->cart_details as $key => $item ) {
 				$download_id = $item['id'];
 				$archive_url = get_post_meta( $download_id, '_edd_free_downloads_file', true );
 
@@ -429,7 +428,7 @@ function edd_free_downloads_process_auto_download() {
 
 			$has_purchased = false;
 			if ( false === $require_new_payment ) {
-				$has_purchased = edd_has_user_purchased( $user_id, $download_id, $variable_price_id = null );
+				$has_purchased = edd_has_user_purchased( $user_id, $download_id, $price_ids );
 			}
 
 			// If the user is already logged in, has purchased this item before and a new record isn't required, look it up.
@@ -511,8 +510,6 @@ function edd_free_downloads_process_auto_download() {
 		}
 	}
 
-	$download_files = array_unique( $download_files );
-
 	$on_complete        = edd_get_option( 'edd_free_downloads_on_complete', 'default' );
 	$success_page       = edd_get_success_page_uri();
 	$custom_url         = edd_get_option( 'edd_free_downloads_redirect', false );
@@ -528,13 +525,30 @@ function edd_free_downloads_process_auto_download() {
 		} else {
 
 			$download_url = array_values( $download_files );
-			$download_url = $download_url[0];
+			$download_url = $download_url[0]['file'];
 
 			$hosted = edd_free_downloads_get_host( $download_url );
 			if ( 'local' !== $hosted ) {
 				$download_url = edd_free_downloads_fetch_remote_file( $download_url, $hosted );
 				$download_url = str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $download_url );
 			}
+		}
+
+		/**
+		 * Looping through files to create report logs
+		 */
+		foreach ( $download_files as $download_file ) {
+			edd_record_download_in_log(
+				$download_file['download_id'],
+				$download_file['file_id'],
+				array(
+					'email' => $payment->email,
+					'id'    => get_current_user_id(),
+					'name'  => $payment->first_name . ' ' . $payment->last_name,
+				),
+				edd_get_ip(),
+				$payment->ID
+			);
 		}
 
 		edd_free_downloads_download_file( $download_url, $hosted );

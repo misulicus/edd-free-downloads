@@ -155,9 +155,16 @@ function edd_free_downloads_get_files( $download_id = 0, $price_id = null ) {
 	$files          = array();
 
 	if ( ! empty( $download_files ) && is_array( $download_files ) ) {
-		foreach ( $download_files as $filekey => $file ) {
-			$filename           = basename( $file['file'] );
-			$files[ $filename ] = $file['file'];
+		foreach ( $download_files as $file_key => $file ) {
+			$file_name = basename( $file['file'] );
+			$file_hash = md5( $file['file'] );
+
+			$files[ $file_hash ] = array( // Using an md5 of the hash as the key assures we just keep each file once.
+				'file'        => $file['file'],
+				'file_id'     => $file_key,
+				'download_id' => $download_id,
+				'file_name'   => $file_name,
+			);
 		}
 	} elseif ( edd_is_bundled_product( $download_id ) ) {
 		$downloads = edd_get_bundled_products( $download_id );
@@ -166,9 +173,16 @@ function edd_free_downloads_get_files( $download_id = 0, $price_id = null ) {
 			$download_files = edd_get_download_files( $download );
 
 			if ( ! empty( $download_files ) && is_array( $download_files ) ) {
-				foreach ( $download_files as $filekey => $file ) {
-					$filename           = basename( $file['file'] );
-					$files[ $filename ] = $file['file'];
+				foreach ( $download_files as $file_key => $file ) {
+					$file_name = basename( $file['file'] );
+					$file_hash = md5( $file['file'] );
+
+					$files[ $file_hash ] = array( // Using an md5 of the hash as the key assures we just keep each file once.
+						'file'        => $file['file'],
+						'file_id'     => $file_key,
+						'download_id' => $download,
+						'file_name'   => $file_name,
+					);
 				}
 			}
 		}
@@ -236,8 +250,8 @@ function edd_free_downloads_compress_files( $files = array(), $download_id = 0 )
 
 		$bundle_id = '';
 
-		foreach ( $files as $file_name => $file_path ) {
-			$bundle_id .= $file_name;
+		foreach( $files as $file => $file_data ) {
+			$bundle_id .= $file_data['file_name'];
 		}
 
 		$bundle_id = md5( $bundle_id );
@@ -281,7 +295,8 @@ function edd_free_downloads_compress_files( $files = array(), $download_id = 0 )
 				exit;
 			}
 
-			foreach ( $files as $file_name => $file_path ) {
+			foreach ( $files as $file => $file_data ) {
+				$file_path = $file['file'];
 				// Is the file hosted locally?
 				$hosted = edd_free_downloads_get_host( $file_path );
 
@@ -291,7 +306,7 @@ function edd_free_downloads_compress_files( $files = array(), $download_id = 0 )
 					$file_path = edd_free_downloads_fetch_remote_file( $file_path, $hosted );
 				}
 
-				$zip->addFile( $file_path, $file_name );
+				$zip->addFile( $file_path, $file_data['file_name'] );
 			}
 
 			$zip->close();
