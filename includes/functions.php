@@ -552,3 +552,14 @@ function edd_free_downloads_get_host( $file_path ) {
 
 	return $hosted;
 }
+
+/**
+ * Fallback in case the edd_debug_log function does not exist, which was added in EDD 2.8.7
+ *
+ * @since 2.2.0
+ */
+if( ! function_exists( 'edd_debug_log' ) ) {
+	function edd_debug_log( $message = '' ) {
+		error_log( $message, 3,  trailingslashit( wp_upload_dir() ) . 'edd-debug-log.txt' );
+	}
+ }
