@@ -177,6 +177,50 @@ function edd_free_downloads_get_files( $download_id = 0, $price_id = null ) {
 	return $files;
 }
 
+/**
+ * Helper function to return the a zip file's complete URL.
+ *
+ * @since 2.2.0
+ *
+ * @param  integer $download_id Download post ID.
+ * @param  string $bundle_id    An MD5 string created by the names of the files attached to the download post.
+ * @return string               Complete URL to zip file.
+ */
+function edd_free_downloads_create_zip_name( $download_id, $bundle_id ) {
+	$upload_dir = wp_upload_dir();
+	$upload_dir = $upload_dir['basedir'] . '/edd-free-downloads-cache';
+	$zip_name   = strtolower( str_replace( ' ', '-', get_bloginfo( 'name' ) ) ) . '-bundle-' . $download_id;
+
+	$zip_file = apply_filters( 'edd_free_downloads_zip_name', $bundle_id . '-' . $zip_name . '.zip' );
+	$zip_file = $upload_dir . '/' . $zip_file;
+
+	return $zip_file;
+}
+
+/**
+ * This function will delete the cached zip file for the download
+ * post upon save_post.
+ *
+ * @since 2.2.0
+ *
+ * @param  integer $download_id Download post ID
+ */
+function edd_free_downloads_save_post_clear_file_cache( $download_id ) {
+
+	$upload_dir = wp_upload_dir();
+	$upload_dir = $upload_dir['basedir'] . '/edd-free-downloads-cache';
+
+	$file_pattern = $upload_dir . '/*bundle-' . $download_id . '.zip';
+	$found_files  = glob( $file_pattern );
+
+	if ( ! empty( $found_files ) ) {
+		foreach ( $found_files as $file ) {
+			@unlink( $file );
+		}
+	}
+
+} // End edd_free_downloads_save_post_clear_file_cache
+add_action( 'save_post', 'edd_free_downloads_save_post_clear_file_cache', 10, 1 );
 
 /**
  * Compress the files for a given download
@@ -189,24 +233,44 @@ function edd_free_downloads_compress_files( $files = array(), $download_id = 0 )
 	$file = false;
 
 	if ( class_exists( 'ZipArchive' ) ) {
-		$upload_dir = wp_upload_dir();
-		$upload_dir = $upload_dir['basedir'] . '/edd-free-downloads-cache';
-		$zip_name   = strtolower( str_replace( ' ', '-', get_bloginfo( 'name' ) ) ) . '-bundle-' . $download_id;
 
 		$bundle_id = '';
 
-		foreach( $files as $file_name => $file_path ) {
+		foreach ( $files as $file_name => $file_path ) {
 			$bundle_id .= $file_name;
 		}
 
-		$bundle_id = wp_hash( $bundle_id, 'nonce' );
+		$bundle_id = md5( $bundle_id );
+		$zip_file = edd_free_downloads_create_zip_name( $download_id, $bundle_id );
 
-		$zip_file = apply_filters( 'edd_free_downloads_zip_name', $zip_name . '-' . $bundle_id . '.zip' );
-		$zip_file = $upload_dir . '/' . $zip_file;
+		/**
+		 * Unsetting file on cache timeout setting
+		 */
+		$edd_invalidate_zip_file_interval = intval( edd_get_option( 'edd_free_downloads_purge_cache_timeout', 1 ) );
+		if ( $edd_invalidate_zip_file_interval && file_exists( $zip_file ) ) {
+
+			if ( $edd_invalidate_zip_file_interval ) {
+
+				$file_expiration_time = filemtime( $zip_file ) + ( $edd_invalidate_zip_file_interval * HOUR_IN_SECONDS );
+
+				/**
+				 * If our file_expiration_time is less than the current server time
+				 * we will unlink ( delete ) the zip file.
+				 *
+				 * Use `time()` instead of i18n'd time since we're dealing with server level timestamps, not user based.
+				 *
+				 * All time comparisons are in Unix timestamps.
+				 */
+				if ( $file_expiration_time < time() ) {
+					edd_debug_log( 'Free Downloads - Existing file past expiration: ' . $zip_file );
+					@unlink( $zip_file );
+				}
+			} // End if edd_free_downloads_purge_cache_timeout is set
+		} // End unsetting file per edd_free_downloads_purge_cache_timeout
 
 		// If caching is disabled, make sure file is deleted
 		if ( file_exists( $zip_file ) && edd_get_option( 'edd_free_downloads_disable_cache', false ) ) {
-			unlink( $zip_file );
+			@unlink( $zip_file );
 		}
 
 		if ( ! file_exists( $zip_file ) ) {

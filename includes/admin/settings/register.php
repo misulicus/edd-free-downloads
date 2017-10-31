@@ -284,6 +284,17 @@ function edd_free_downloads_add_settings( $settings ) {
 			'tooltip_desc'  => __( 'Free Downloads caches remote files to prevent long download times while compressing multi-file downloads. If you prefer not to use this feature, check this option.', 'edd-free-downloads' )
 		),
 		array(
+			'id'            => 'edd_free_downloads_purge_cache_timeout',
+			'name'          => __( 'Cache Timeout', 'edd-free-downloads' ),
+			'desc'          => __( 'Enter the length of the cache timeout, in hours.', 'edd-free-downloads'),
+			'type'          => 'text',
+			'size'          => 'small',
+			'std'           => '1',
+			'allow_blank'   => false,
+			'tooltip_title' => __( 'Cache Timeout', 'edd-free-downloads' ),
+			'tooltip_desc'  => __( 'If a cached file is requested, Free Downloads will see when it was created. If that time is greater than this cache timeout, the file will be recreated.', 'edd-free-downloads' )
+		),
+		array(
 			'id'   => 'free_downloads_display_purge_cache',
 			'name' => __( 'Purge Cache', 'edd-free-downloads' ),
 			'desc' => '',
