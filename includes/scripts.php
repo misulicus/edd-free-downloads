@@ -25,7 +25,7 @@ function edd_free_downloads_scripts() {
 	 */
 	wp_enqueue_style( 'dashicons', site_url( '/wp-includes/css/dashicons.min.css' ) );
 
-	$suffix = ( defined( 'EDD_FREE_DOWNLOADS_SCRIPT_DEBUG' ) && EDD_FREE_DOWNLOADS_SCRIPT_DEBUG ) ? '' : '.min';
+	$suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
 
 	wp_register_script( 'edd-free-downloads-mobile', EDD_FREE_DOWNLOADS_URL . 'assets/js/isMobile'. $suffix . '.js', array( 'jquery' ) );
 	wp_enqueue_script( 'edd-free-downloads-mobile' );
@@ -37,27 +37,28 @@ function edd_free_downloads_scripts() {
 	wp_enqueue_script( 'edd-free-downloads' );
 
 	// Localize some settings for use in Javascript.
-	$close_button    = edd_get_option( 'edd_free_downloads_close_button', false );
-	$close_button    = ( $close_button ? 'box' : 'overlay' );
-	$download_label  = edd_get_option( 'edd_free_downloads_button_label', __( 'Download Now', 'edd-free-downloads' ) );
-	$optional_fields = edd_no_guest_checkout();
+	$close_button            = edd_get_option( 'edd_free_downloads_close_button', false );
+	$close_button            = ( $close_button ? 'box' : 'overlay' );
+	$download_label          = edd_get_option( 'edd_free_downloads_button_label', __( 'Download Now', 'edd-free-downloads' ) );
+	$guest_checkout_disabled = edd_no_guest_checkout();
 
 	wp_localize_script( 'edd-free-downloads', 'edd_free_downloads_vars', array(
-		'close_button'         => $close_button,
-		'user_registration'    => ( edd_get_option( 'edd_free_downloads_user_registration', false ) && ! class_exists( 'EDD_Auto_Register' ) ) ? 'true' : 'false',
-		'require_name'         => edd_get_option( 'edd_free_downloads_require_name', false ) ? 'true' : 'false',
-		'download_loading'     => __( 'Please Wait... ', 'edd-free-downloads' ),
-		'download_label'       => $download_label,
-		'modal_download_label' => edd_get_option( 'edd_free_downloads_modal_button_label', __( 'Download Now', 'edd-free-downloads' ) ),
-		'has_ajax'             => edd_is_ajax_enabled(),
-		'ajaxurl'              => edd_get_ajax_url(),
-		'mobile_url'           => esc_url( add_query_arg( array( 'edd-free-download' => 'true' ) ) ),
-		'form_class'           => apply_filters( 'edd_free_downloads_form_class', 'edd_purchase_submit_wrapper' ),
-		'bypass_logged_in'     => edd_get_option( 'edd_free_downloads_bypass_logged_in', false ) && is_user_logged_in() ? 'true' : 'false',
-		'is_download'          => ( is_singular( 'download' ) ? 'true' : 'false' ),
-		'edd_is_mobile'        => wp_is_mobile(),
-		'success_page'         => edd_get_success_page_uri(),
-		'optional_fields'      => $optional_fields,
+		'close_button'            => $close_button,
+		'user_registration'       => ( edd_get_option( 'edd_free_downloads_user_registration', false ) && ! class_exists( 'EDD_Auto_Register' ) ) ? 'true' : 'false',
+		'require_name'            => edd_get_option( 'edd_free_downloads_require_name', false ) ? 'true' : 'false',
+		'download_loading'        => __( 'Please Wait... ', 'edd-free-downloads' ),
+		'download_label'          => $download_label,
+		'modal_download_label'    => edd_get_option( 'edd_free_downloads_modal_button_label', __( 'Download Now', 'edd-free-downloads' ) ),
+		'has_ajax'                => edd_is_ajax_enabled(),
+		'ajaxurl'                 => edd_get_ajax_url(),
+		'mobile_url'              => esc_url( add_query_arg( array( 'edd-free-download' => 'true' ) ) ),
+		'form_class'              => apply_filters( 'edd_free_downloads_form_class', 'edd_purchase_submit_wrapper' ),
+		'bypass_logged_in'        => edd_get_option( 'edd_free_downloads_bypass_logged_in', false ) && is_user_logged_in() ? 'true' : 'false',
+		'is_download'             => ( is_singular( 'download' ) ? 'true' : 'false' ),
+		'edd_is_mobile'           => wp_is_mobile(),
+		'success_page'            => edd_get_success_page_uri(),
+		'guest_checkout_disabled' => $guest_checkout_disabled,
+		'email_verification'      => edd_free_downloads_verify_email(),
 	) );
 }
 add_action( 'wp_enqueue_scripts', 'edd_free_downloads_scripts' );

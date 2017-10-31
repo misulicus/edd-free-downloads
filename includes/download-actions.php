@@ -151,9 +151,6 @@ function edd_free_download_process() {
 		$price_ids = sanitize_text_field( $_GET['price_ids'] );
 	}
 
-	// Keep an array of files that are going to be delivered for the selected item.
-	$download_files = array();
-
 	if ( isset( $price_ids ) && is_array( $price_ids ) ) {
 		foreach ( $price_ids as $cart_id => $price_id ) {
 			/**
@@ -163,11 +160,6 @@ function edd_free_download_process() {
 			 */
 			if ( ! edd_is_free_download( $download_id, $price_id ) ) {
 				wp_die( __( 'The requested product is not a free product! Please try again or contact support.', 'edd-free-downloads' ), __( 'Oops!', 'edd-free-downloads' ) );
-			}
-
-			$item_files = edd_get_download_files( $download_id, $price_id );
-			if ( ! empty ( $item_files ) ) {
-				$download_files[] = $item_files;
 			}
 
 			$payment->add_download( $download_id, array(
@@ -189,11 +181,6 @@ function edd_free_download_process() {
 			wp_die( __( 'The requested product is not a free product! Please try again or contact support.', 'edd-free-downloads' ), __( 'Oops!', 'edd-free-downloads' ) );
 		}
 
-		$item_files = edd_get_download_files( $download_id, $price_ids );
-		if ( ! empty ( $item_files ) ) {
-			$download_files[] = $item_files;
-		}
-
 		$payment->add_download( $download_id, array(
 			'price_id'   => $price_ids,
 			'item_price' => 0
@@ -209,31 +196,29 @@ function edd_free_download_process() {
 			wp_die( __( 'An internal error has occurred, please try again or contact support. Invalid item.', 'edd-free-downloads' ), __( 'Oops!', 'edd-free-downloads' ) );
 		}
 
-		$item_files = edd_get_download_files( $download_id );
-		if ( ! empty ( $item_files ) ) {
-			$download_files[] = $item_files;
-		}
-
 		$payment->add_download( $download_id, array(
 			'price_id'   => false, // We have a free download
 		) );
 	}
 
-	// Disable purchase emails
-	if ( edd_get_option( 'edd_free_downloads_disable_emails', false ) ) {
-		remove_action( 'edd_complete_purchase', 'edd_trigger_purchase_receipt', 999 );
+	$payment->save();
 
-		if ( function_exists( 'Receiptful' ) ) {
-			remove_action( 'edd_complete_purchase', array( Receiptful()->email, 'send_transactional_email' ) );
-		}
+	// If verification is not required, go ahead and mark the payment as 'completed'.
+	$require_verification = edd_free_downloads_verify_email();
+	if ( ! $require_verification ) {
+
+		do_action( 'edd_free_downloads_pre_complete_payment', $payment->ID );
+
+		$payment->status = 'publish';
+		$payment->save();
+
+		do_action( 'edd_free_downloads_post_complete_payment', $payment->ID );
+
 	}
-
-	$payment->save();
-	$payment->status = 'publish';
-	$payment->save();
 	$payment->add_note( __( 'Purchased through EDD Free Downloads', 'edd-free-downloads' ) );
 
 	edd_empty_cart();
+
 	$purchase_data['purchase_key'] = $payment->key;
 	edd_set_purchase_session( $purchase_data );
 
@@ -249,7 +234,53 @@ function edd_free_download_process() {
 		edd_register_and_login_new_user( $account );
 	}
 
-	$payment_meta       = edd_get_payment_meta( $payment->ID );
+	if ( $require_verification ) {
+		$email_sent = edd_free_downloads_send_verification( $payment, $email );
+		$results    = array();
+		if ( $email_sent ) {
+			$results['success'] = true;
+			$results['message'] = __( 'Your email has been successfully sent.', 'edd-free-downloads' );
+
+			$payment->add_note( sprintf( __( 'Free Downloads verification sent to %s.', 'edd-free-downloads' ), $email ) );
+		} else {
+			$results['success'] = false;
+			$results['message'] = __( 'Your email failed to send, please try again.', 'edd-free-downloads' );
+
+			$payment->add_note( sprintf( __( 'Free Downloads verification failed to send to %s.', 'edd-free-downloads' ), $email ) );
+		}
+
+		header('Content-Type: application/json');
+		echo json_encode( $results );
+		edd_die();
+	}
+
+	edd_free_downloads_complete_download( $payment );
+}
+add_action( 'edd_free_download_process', 'edd_free_download_process' );
+
+/**
+ * Do the final processing that delivers the files for a free downloads purchase.
+ *
+ * @since 2.2.0
+ * @param EDD_Payment $payment The payment object
+ */
+function edd_free_downloads_complete_download( $payment = null ) {
+
+	if ( empty( $payment ) || ! is_a( $payment, 'EDD_Payment' ) ) {
+		wp_die( __( 'Error completing download request', 'edd-free-downloads' ), 403 );
+	}
+
+	// Determine if we have files to deliver
+	$all_files = array();
+	foreach ( $payment->downloads as $download ) {
+		$price_id       = isset( $download['options']['price_id'] ) ? $download['options']['price_id'] : null;
+		$download_files = edd_get_download_files( $download['id'], $price_id );
+
+		if ( ! empty( $download_files ) ) {
+			$all_files[] = $download_files;
+		}
+	}
+
 	$on_complete        = edd_get_option( 'edd_free_downloads_on_complete', 'default' );
 	$success_page       = edd_get_success_page_uri();
 	$custom_url         = edd_get_option( 'edd_free_downloads_redirect', false );
@@ -266,8 +297,8 @@ function edd_free_download_process() {
 	 *
 	 * Also logic to make sure if the custom redirect option is set
 	 */
-	edd_debug_log( 'Free Downloads: Processing download, has downloads - ' . var_export( $download_files, true ) );
-	if ( empty( $download_files ) && ! in_array( $on_complete, array( 'default', 'redirect' ) ) ) {
+	edd_debug_log( 'Free Downloads: Processing download, has downloads - ' . var_export( $all_files, true ) );
+	if ( empty( $all_files ) && ! in_array( $on_complete, array( 'default', 'redirect' ) ) ) {
 		$on_complete = 'default';
 	}
 
@@ -321,9 +352,8 @@ function edd_free_download_process() {
 	edd_debug_log( 'Free Downloads: Processing download with redirect URL of - ' . $redirect_url );
 	wp_redirect( apply_filters( 'edd_free_downloads_redirect', $redirect_url, $payment->ID ) );
 	edd_die();
-}
-add_action( 'edd_free_download_process', 'edd_free_download_process' );
 
+}
 
 /**
  * Process auto download
@@ -343,11 +373,10 @@ function edd_free_downloads_process_auto_download() {
 	$download_files = array();
 
 	if ( isset( $_GET['payment-id'] ) ) {
-		$payment_meta = edd_get_payment_meta( $_GET['payment-id'] );
-		$cart         = edd_get_payment_meta_cart_details( $_GET['payment-id'], true );
+		$payment = edd_get_payment( intval( $_GET['payment-id'] ) );
 
-		if ( $cart ) {
-			foreach ( $cart as $key => $item ) {
+		if ( ! empty( $payment->cart_details ) ) {
+			foreach ( $payment->cart_details as $key => $item ) {
 				$download_id = $item['id'];
 				$archive_url = get_post_meta( $download_id, '_edd_free_downloads_file', true );
 
@@ -399,7 +428,7 @@ function edd_free_downloads_process_auto_download() {
 
 			$has_purchased = false;
 			if ( false === $require_new_payment ) {
-				$has_purchased = edd_has_user_purchased( $user_id, $download_id, $variable_price_id = null );
+				$has_purchased = edd_has_user_purchased( $user_id, $download_id, $price_ids );
 			}
 
 			// If the user is already logged in, has purchased this item before and a new record isn't required, look it up.
@@ -450,9 +479,14 @@ function edd_free_downloads_process_auto_download() {
 					$payment->add_download( $download_id, array( 'item_price' => 0 ) );
 				}
 
-				$payment->status  = 'publish';
+				do_action( 'edd_free_downloads_pre_complete_payment', $payment->ID );
+
 				$payment->gateway = 'manual';
+				$payment->status  = 'publish';
 				$payment->save();
+
+				do_action( 'edd_free_downloads_post_complete_payment', $payment->ID );
+
 
 				$payment->add_note( __( 'Purchased through EDD Free Downloads', 'edd-free-downloads' ) );
 			}
@@ -476,8 +510,6 @@ function edd_free_downloads_process_auto_download() {
 		}
 	}
 
-	$download_files = array_unique( $download_files );
-
 	$on_complete        = edd_get_option( 'edd_free_downloads_on_complete', 'default' );
 	$success_page       = edd_get_success_page_uri();
 	$custom_url         = edd_get_option( 'edd_free_downloads_redirect', false );
@@ -493,13 +525,30 @@ function edd_free_downloads_process_auto_download() {
 		} else {
 
 			$download_url = array_values( $download_files );
-			$download_url = $download_url[0];
+			$download_url = $download_url[0]['file'];
 
 			$hosted = edd_free_downloads_get_host( $download_url );
 			if ( 'local' !== $hosted ) {
 				$download_url = edd_free_downloads_fetch_remote_file( $download_url, $hosted );
 				$download_url = str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $download_url );
 			}
+		}
+
+		/**
+		 * Looping through files to create report logs
+		 */
+		foreach ( $download_files as $download_file ) {
+			edd_record_download_in_log(
+				$download_file['download_id'],
+				$download_file['file_id'],
+				array(
+					'email' => $payment->email,
+					'id'    => get_current_user_id(),
+					'name'  => $payment->first_name . ' ' . $payment->last_name,
+				),
+				edd_get_ip(),
+				$payment->ID
+			);
 		}
 
 		edd_free_downloads_download_file( $download_url, $hosted );

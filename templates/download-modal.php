@@ -5,9 +5,11 @@ if ( is_user_logged_in() ) {
 	$user = new WP_User( get_current_user_id() );
 }
 
-$desktop_redirect = edd_get_option( 'edd_free_downloads_redirect' );
-$mobile_redirect = edd_get_option( 'edd_free_downloads_mobile_redirect' );
-$is_mobile = $_GET['edd_is_mobile'] ? true : false;
+$desktop_redirect     = edd_get_option( 'edd_free_downloads_redirect' );
+$mobile_redirect      = edd_get_option( 'edd_free_downloads_mobile_redirect' );
+$is_mobile            = $_GET['edd_is_mobile'] ? true : false;
+$require_verification = edd_free_downloads_verify_email();
+$require_login        = edd_no_guest_checkout();
 
 $email = isset( $user ) ? $user->user_email : '';
 $fname = isset( $user ) ? $user->user_firstname : '';
@@ -71,7 +73,7 @@ $price_ids = isset( $_GET['price_ids'] ) ? array_map( 'absint', $_GET['price_ids
 
 		<p>
 			<label for="edd_free_download_username" class="edd-free-downloads-label"><?php esc_html_e( 'Username', 'edd-free-downloads' ); ?>
-				<?php if ( ! empty( $_GET['optional_fields'] ) ) : ?>
+				<?php if ( $require_login ) : ?>
 					<span class="edd-free-downloads-required">*</span>
 				<?php endif; ?>
 			</label>
@@ -81,7 +83,7 @@ $price_ids = isset( $_GET['price_ids'] ) ? array_map( 'absint', $_GET['price_ids
 
 		<p>
 			<label for="edd_free_download_pass" class="edd-free-downloads-label"><?php esc_html_e( 'Password', 'edd-free-downloads' ); ?>
-				<?php if ( ! empty( $_GET['optional_fields'] ) ) : ?>
+				<?php if ( $require_login ) : ?>
 					<span class="edd-free-downloads-required">*</span>
 				<?php endif; ?>
 			</label>
@@ -91,7 +93,7 @@ $price_ids = isset( $_GET['price_ids'] ) ? array_map( 'absint', $_GET['price_ids
 
 		<p>
 			<label for="edd_free_download_pass2" class="edd-free-downloads-label"><?php esc_html_e( 'Confirm Password', 'edd-free-downloads' ); ?>
-				<?php if ( ! empty( $_GET['optional_fields'] ) ) : ?>
+				<?php if ( $require_login ) : ?>
 					<span class="edd-free-downloads-required">*</span>
 				<?php endif; ?>
 			</label>
@@ -159,13 +161,23 @@ $price_ids = isset( $_GET['price_ids'] ) ? array_map( 'absint', $_GET['price_ids
 	<input type="hidden" name="edd_free_download_price_id[]" value="<?php echo absint( $price_id ); ?>" />
 	<?php endforeach; ?>
 
+	<?php if ( $require_verification ) : ?>
+		<div class="edd-free-downloads-verification-message-wrapper edd-alert edd-alert-info">
+			<?php do_action( 'edd_free_downloads_before_verification_message', $download_id ); ?>
+			<span class="edd-free-downloads-verification-message">
+				<?php echo esc_html( edd_free_downloads_verify_message() ); ?>
+			</span>
+			<?php do_action( 'edd_free_downloads_after_verification_message', $download_id ); ?>
+		</div>
+	<?php endif; ?>
+
 	<?php
 	if ( false === $is_mobile && ! empty( $desktop_redirect ) ) {
 		/**
 		 * We are not on a mobile device ( i.e. we on a desktop view )
 		 * and we have a url redirect set.
 		 *
-		 * @todo  This is the exact same html as the final `else` statment
+		 * @todo  This is the exact same html as the final `else` statement
 		 * logic should be consolidated.
 		 */
 		?>
@@ -192,7 +204,7 @@ $price_ids = isset( $_GET['price_ids'] ) ? array_map( 'absint', $_GET['price_ids
 	}
 	?>
 
-	<?php if ( edd_get_option( 'edd_free_downloads_direct_download' ) ) : ?>
+	<?php if ( edd_get_option( 'edd_free_downloads_direct_download' ) && ! $require_verification ) : ?>
 		<?php
 		$link_text = edd_get_option( 'edd_free_downloads_direct_download_label', __( 'No thanks, proceed to download', 'edd-free-downloads' ) );
 

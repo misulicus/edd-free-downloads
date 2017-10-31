@@ -21,6 +21,8 @@ if ( is_user_logged_in() ) {
 	$user = new WP_User( get_current_user_id() );
 }
 
+$require_verification = edd_free_downloads_verify_email();
+
 $email = isset( $user ) ? $user->user_email : '';
 $fname = isset( $user ) ? $user->user_firstname : '';
 $lname = isset( $user ) ? $user->user_lastname : '';
@@ -31,6 +33,8 @@ $rname = edd_get_option( 'edd_free_downloads_require_name', false ) ? ' <span cl
 $color = edd_get_option( 'checkout_color', 'blue' );
 $color = ( $color == 'inherit' ) ? '' : $color;
 $label = edd_get_option( 'edd_free_downloads_modal_button_label', __( 'Download Now', 'edd-free-downloads' ) );
+
+$require_login = edd_no_guest_checkout();
 ?>
 <form id="edd_free_download_form" method="post">
 	<?php do_action( 'edd_free_downloads_before_redirect_form', $wp_query ); ?>
@@ -58,17 +62,32 @@ $label = edd_get_option( 'edd_free_downloads_modal_button_label', __( 'Download 
 	<?php do_action( 'edd_free_downloads_before_redirect_form_registration', $wp_query ); ?>
 
 	<p>
-		<label for="edd_free_download_username" class="edd-free-downloads-label"><?php _e( 'Username', 'edd-free-downloads' ); ?> <span class="edd-free-downloads-required">*</span></label>
+		<label for="edd_free_download_username" class="edd-free-downloads-label">
+			<?php if ( $require_login ) : ?>
+				<span class="edd-free-downloads-required">*</span>
+			<?php endif; ?>
+			<?php _e( 'Username', 'edd-free-downloads' ); ?> <span class="edd-free-downloads-required">*</span>
+		</label>
 		<input type="text" name="edd_free_download_username" id="edd_free_download_username" class="edd-free-download-field" placeholder="<?php _e( 'Username', 'edd-free-downloads' ); ?>" value="" />
 	</p>
 
 	<p>
-		<label for="edd_free_download_pass" class="edd-free-downloads-label"><?php _e( 'Password', 'edd-free-downloads' ); ?> <span class="edd-free-downloads-required">*</span></label>
+		<label for="edd_free_download_pass" class="edd-free-downloads-label">
+			<?php if ( $require_login ) : ?>
+				<span class="edd-free-downloads-required">*</span>
+			<?php endif; ?>
+			<?php _e( 'Password', 'edd-free-downloads' ); ?> <span class="edd-free-downloads-required">*</span>
+		</label>
 		<input type="password" name="edd_free_download_pass" id="edd_free_download_pass" class="edd-free-download-field" />
 	</p>
 
 	<p>
-		<label for="edd_free_download_pass2" class="edd-free-downloads-label"><?php _e( 'Confirm Password', 'edd-free-downloads' ); ?> <span class="edd-free-downloads-required">*</span></label>
+		<label for="edd_free_download_pass2" class="edd-free-downloads-label">
+			<?php if ( $require_login ) : ?>
+				<span class="edd-free-downloads-required">*</span>
+			<?php endif; ?>
+			<?php _e( 'Confirm Password', 'edd-free-downloads' ); ?> <span class="edd-free-downloads-required">*</span>
+		</label>
 		<input type="password" name="edd_free_download_pass2" id="edd_free_download_pass2" class="edd-free-download-field" />
 	</p>
 
@@ -108,6 +127,16 @@ $label = edd_get_option( 'edd_free_downloads_modal_button_label', __( 'Download 
 		</div>
 	<?php endif; ?>
 
+	<?php if ( $require_verification ) : ?>
+		<div class="edd-free-downloads-verification-message-wrapper edd-alert edd-alert-info">
+			<?php do_action( 'edd_free_downloads_before_verification_message', $download_id ); ?>
+			<span class="edd-free-downloads-verification-message">
+				<?php echo esc_html( edd_free_downloads_verify_message() ); ?>
+			</span>
+			<?php do_action( 'edd_free_downloads_after_verification_message', $download_id ); ?>
+		</div>
+	<?php endif; ?>
+
 	<?php do_action( 'edd_free_downloads_after_redirect_form', $wp_query ); ?>
 
 	<input type="hidden" name="edd_free_download_check" value="" />
@@ -129,7 +158,7 @@ $label = edd_get_option( 'edd_free_downloads_modal_button_label', __( 'Download 
 	<button name="edd_free_download_submit" class="edd-free-download-submit button <?php echo $color; ?>"><span><?php echo $label; ?></span></button>
 	<button name="edd_free_download_cancel" class="edd-free-download-cancel button <?php echo $color; ?>"><span><?php _e( 'Cancel', 'edd-free-downloads' ); ?></span></button>
 
-	<?php if ( edd_get_option( 'edd_free_downloads_direct_download' ) ) : ?>
+	<?php if ( edd_get_option( 'edd_free_downloads_direct_download' ) && ! $require_verification ) : ?>
 		<?php
 		$link_text = edd_get_option( 'edd_free_downloads_direct_download_label', __( 'No thanks, proceed to download', 'edd-free-downloads' ) );
 

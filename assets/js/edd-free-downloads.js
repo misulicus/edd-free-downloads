@@ -162,7 +162,6 @@ jQuery(document.body).ready(function ($) {
                     'edd_is_mobile': edd_free_downloads_vars.edd_is_mobile,
                     'require_name': edd_free_downloads_vars.require_name,
                     'success_page': edd_free_downloads_vars.success_page,
-                    'optional_fields': edd_free_downloads_vars.optional_fields,
                 },
                 success: function( data ) {
 
@@ -253,45 +252,40 @@ jQuery(document.body).ready(function ($) {
                          * a user registration is NOT required
                          */
                         if ( 'true' === edd_free_downloads_vars.user_registration ) {
-                            var username, password, password2;
+                            var username, password, password2, registration_required;
 
                             username  = $('input[name="edd_free_download_username"]');
                             password  = $('input[name="edd_free_download_pass"]');
                             password2 = $('input[name="edd_free_download_pass2"]');
+                            registration_required = edd_free_downloads_vars.guest_checkout_disabled === '1';
 
-                            if (username.val() === '' && '1' === edd_free_downloads_vars.optional_fields ) {
+                            if (username.val() === '' && registration_required ) {
 
                                     $('#edd-free-download-error-username-required').css('display', 'block');
 
                                     has_error++;
 
-                            } else {
-                                $('#edd-free-download-error-username-required').css('display', 'none');
                             }
 
-                            if (password.val() === '' && ( '1' === edd_free_downloads_vars.optional_fields || '' !== username.val() ) ) {
+                            if (password.val() === '' && ( registration_required || '' !== username.val() ) ) {
 
                                     $('#edd-free-download-error-password-required').css('display', 'block');
 
                                     has_error++;
 
-                            } else {
-                                $('#edd-free-download-error-password-required').css('display', 'none');
                             }
 
-                            if (password2.val() === '' && ( '1' === edd_free_downloads_vars.optional_fields || '' !== username.val() ) ) {
+                            if (password2.val() === '' && ( registration_required || '' !== username.val() ) ) {
 
                                     $('#edd-free-download-error-password2-required').css('display', 'block');
 
                                     has_error++;
 
-                            } else {
-                                $('#edd-free-download-error-password2-required').css('display', 'none');
                             }
 
                             if (password.val() !== '' && password2.val() !== '') {
 
-                                if (password.val() !== password2.val()  && '1' === edd_free_downloads_vars.optional_fields ) {
+                                if (password.val() !== password2.val() && (registration_required || '' !== username.val()) ) {
 
                                         $('#edd-free-download-error-password-unmatch').css('display', 'block');
 
@@ -304,19 +298,38 @@ jQuery(document.body).ready(function ($) {
                         }
 
                         if (has_error === 0) {
-                            $('#edd_free_download_form').submit();
-                            $('.edd-free-download-submit span').html(edd_free_downloads_vars.download_loading);
-                            $('.edd-free-download-submit span').append('<i class="edd-icon-spinner edd-icon-spin"></i>');
-                            $('.edd-free-download-submit').attr('disabled', 'disabled');
-
-                            eddFreeDownloadCloseModal();
+                            if ( edd_free_downloads_vars.email_verification === '1' ) {
+                                e.preventDefault();
+                                var data = $('#edd_free_download_form').serialize();
+                                $.ajax({
+                                    url      : edd_free_downloads_vars.ajaxurl,
+                                    type     : 'POST',
+                                    data     : data,
+                                    success: function (response) {
+                                        $('.edd-free-downloads-verification-message').html(response.message).fadeIn();
+                                        $('.edd-free-downloads-verification-message-wrapper').removeClass('edd-alert-info');
+                                        if ( response.success ) {
+                                            $('.edd-free-downloads-verification-message-wrapper').addClass('edd-alert-success', 250);
+                                            $('.edd-free-download-submit').hide();
+                                        } else {
+                                            $('.edd-free-downloads-verification-message-wrapper').addClass('edd-alert-error', 250);
+                                        }
+                                    }
+                                });
+                            } else {
+                                $('#edd_free_download_form').submit();
+                                $('.edd-free-download-submit span').html(edd_free_downloads_vars.download_loading);
+                                $('.edd-free-download-submit span').append('<i class="edd-icon-spinner edd-icon-spin"></i>');
+                                $('.edd-free-download-submit').attr('disabled', 'disabled');
+                                eddFreeDownloadCloseModal();
+                            }
                         } else {
                             $('.edd-free-download-errors').css('display', 'block');
                             $('.edd-free-download-submit').removeAttr('disabled');
                             e.preventDefault();
                         }
 
-                    } ); // End validation checks
+                    }); // End validation checks
 
                     $( '#edd-free-downloads-modal' ).on( 'click', 'a.edd-free-downloads-direct-download-link', function( e ) {
                         e.preventDefault();

@@ -108,6 +108,10 @@ form#edd_free_download_form {
     margin-top: 25px;
 }
 
+.edd-free-downloads-verification-message-wrapper {
+    text-align: center;
+}
+
 /** Modal Errors **/
 .edd-free-download-errors {
     border-radius: 2px;

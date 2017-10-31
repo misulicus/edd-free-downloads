@@ -262,7 +262,6 @@ function edd_free_downloads_delete_cached_files() {
 }
 add_action( 'edd_free_downloads_delete_cached_files', 'edd_free_downloads_delete_cached_files' );
 
-
 /**
  * Get the notes for a given download
  *
