@@ -296,7 +296,7 @@ function edd_free_downloads_compress_files( $files = array(), $download_id = 0 )
 			}
 
 			foreach ( $files as $file => $file_data ) {
-				$file_path = $file['file'];
+				$file_path = $file_data['file'];
 				// Is the file hosted locally?
 				$hosted = edd_free_downloads_get_host( $file_path );
 
