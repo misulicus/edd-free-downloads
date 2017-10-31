@@ -470,7 +470,7 @@ function edd_free_downloads_fetch_remote_file( $file_path, $hosted ) {
 			add_filter( 'edd_symlink_file_downloads', 'edd_free_downloads_disable_symlink' );
 
 			$dfs = new EDDDropboxFileStore();
-
+			$dfs->dbfsInit();
 			return $dfs->getDownloadURL( $file_path );
 
 		} else {
@@ -542,7 +542,7 @@ function edd_free_downloads_get_host( $file_path ) {
 		$hosted = 'local';
 	} elseif ( strpos( $file_path, ABSPATH ) !== false ) {
 		$hosted = 'local';
-	} elseif ( filter_var( $file_path, FILTER_VALIDATE_URL ) === FALSE && strpos( $file_path, 'edd-dbfs' ) !== false ) {
+	} elseif ( strpos( $file_path, 'edd-dbfs' ) !== false ) {
 		$hosted = 'dropbox';
 	} elseif ( filter_var( $file_path, FILTER_VALIDATE_URL ) === FALSE && $file_path[0] !== '/' ) {
 		$hosted = 'amazon';
