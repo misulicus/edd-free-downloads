@@ -42,18 +42,93 @@ function edd_free_downloads_get_confirmation_link( $payment_id = 0 ) {
 		return '';
 	}
 
-	$token    = wp_hash( $payment->key, 'nonce' );
-	$base_url = home_url( 'index.php' );
-	$args     = array(
-		'edd_action' => 'free_download_verify',
-		'token'      => $token,
-		'key'        => $payment->key,
+	$token      = wp_hash( $payment->key, 'nonce' );
+	$base_url   = home_url( 'index.php' );
+	$expiration = current_time( 'timestamp' ) + ( edd_get_option( 'download_link_expiration', 24 ) * HOUR_IN_SECONDS );
+	$args       = array(
+		'edd_action'      => 'free_download_verify',
+		'token'           => $token,
+		'key'             => $payment->key,
+		'ttl'             => $expiration,
+		'verify_download' => wp_hash( $payment->key . $token . $expiration, 'nonce' ),
 	);
 
 	$url = add_query_arg( $args, $base_url );
 
-	return wp_nonce_url( $url, 'edd_free_downloads_verify', 'verify_download' );
+	return $url;
 }
+
+/**
+ * Run the verification process for when a user clicks the link in the verification email.
+ *
+ * @since 2.2.0
+ * @uses edd_free_downloads_complete_download()
+ */
+function edd_free_download_verify() {
+	$payment_key = ! empty( $_GET['key'] )   ? sanitize_text_field( $_GET['key'] )       : false;
+	$token       = ! empty( $_GET['token'] ) ? sanitize_text_field( $_GET['token'] )     : false;
+	$payment     = ! empty( $payment_key )   ? edd_get_payment_by( 'key', $payment_key ) : false;
+	$expiration  = ! empty( $_GET['ttl'] )   ? absint( $_GET['ttl'] )                    : false;
+	$expired     = current_time( 'timestamp' ) > $expiration;
+
+	$checksum    = ! empty( $_GET['verify_download'] ) ? sanitize_text_field( $_GET['verify_download'] ) : '';
+	$verified    = false;
+	$challenge   = wp_hash( $payment_key . $token . $expiration, 'nonce' );
+	if ( hash_equals( $checksum, $challenge ) ) {
+		$verified = true;
+	}
+
+	$error_message = false;
+
+	if ( ! $verified || $expired ) {
+		if ( ! empty( $payment ) ) {
+			$download_id   = $payment->downloads[0]['id'];
+			$download      = new EDD_Download( $download_id );
+
+			if ( $expired ) {
+				$error_message = sprintf(
+					__( 'Your verification link for <a href="%s">%s</a> has expired'),
+					get_permalink( $download_id ),
+					$download->get_name()
+				);
+			} else {
+				$error_message = sprintf(
+					__( 'Error processing download of <a href="%s">%s</a>'),
+					get_permalink( $download_id ),
+					$download->get_name()
+				);
+			}
+
+		} else {
+			$error_message = __( 'Error processing download. Please contact support.', 'edd-free-downloads' );
+		}
+	}
+
+	if ( ! empty( $error_message ) ) {
+		wp_die( $error_message, __( 'Error', 'edd-free-downloads' ), 403 );
+	}
+
+	// Verify that the token provided matches that of the payment that exists.
+	if ( ! hash_equals( wp_hash( $payment->key, 'nonce' ), $token ) ) {
+		wp_die( __( 'Validation failed.', 'edd-free-downloads' ), __( 'Validation error', 'edd-free-downloads' ) );
+	}
+
+	if ( 'publish' !== $payment->status ) {
+
+		do_action( 'edd_free_downloads_pre_complete_payment', $payment->ID );
+
+		$payment->status = 'publish';
+		$payment->save();
+
+		do_action( 'edd_free_downloads_post_complete_payment', $payment->ID );
+
+		$payment->add_note( __( 'Free Downloads email verification complete.', 'edd-free-downloads' ) );
+	}
+
+	edd_free_downloads_complete_download( $payment );
+
+}
+add_action( 'edd_free_download_verify', 'edd_free_download_verify' );
 
 /**
  * Retrieve the download name for a Free Download 'purchase'.
@@ -99,7 +174,8 @@ function edd_free_downloads_verify_email() {
  * @return string
  */
 function edd_free_downloads_verify_message() {
-	$verification_message = edd_get_option( 'edd_free_downloads_require_verification_message', __( 'An email will be sent to the provided address to complete your download.', 'edd-free-downloads' ) );
+	$default_message      = __( 'An email will be sent to the provided address to complete your download.', 'edd-free-downloads' );
+	$verification_message = edd_get_option( 'edd_free_downloads_require_verification_message', $default_message );
 	return apply_filters( 'edd_free_downloads_verification_message', $verification_message );
 }
 
@@ -110,7 +186,8 @@ function edd_free_downloads_verify_message() {
  * @return string
  */
 function edd_free_downloads_verification_subject() {
-	$verification_subject = edd_get_option( 'edd_free_downloads_verification_email_subject', __( 'Confirm your free download.', 'edd-free-downloads' ) );
+	$default_subject      = __( 'Confirm your free download.', 'edd-free-downloads' );
+	$verification_subject = edd_get_option( 'edd_free_downloads_verification_email_subject', $default_subject );
 	return apply_filters( 'edd_free_downloads_verification_subject', $verification_subject );
 }
 
@@ -121,7 +198,8 @@ function edd_free_downloads_verification_subject() {
  * @return string
  */
 function edd_free_downloads_verification_email() {
-	$verification_email = edd_get_option( 'edd_free_downloads_verification_email', __( "Please click the following link to complete your download.\n\n" . "{free_downloads_verification_link}", 'edd-free-downloads' ) );
+	$default_message    = __( "Please click the following link to complete your download.\n\n" . "{free_downloads_verification_link}", 'edd-free-downloads' );
+	$verification_email = edd_get_option( 'edd_free_downloads_verification_email', $default_message );
 	return apply_filters( 'edd_free_downloads_verification_email', $verification_email );
 }
 
@@ -175,55 +253,6 @@ function edd_free_downloads_send_verification( $payment = null, $to_email = '' )
 
 	return $sent;
 }
-
-/**
- * Run the verification process for when a user clicks the link in the verification email.
- *
- * @since 2.2.0
- * @uses edd_free_downloads_complete_download()
- */
-function edd_free_download_verify() {
-	$payment_key = ! empty( $_GET['key'] )   ? sanitize_text_field( $_GET['key'] )     : false;
-	$token       = ! empty( $_GET['token'] ) ? sanitize_text_field( $_GET['token'] )   : false;
-	$payment     = ! empty( $payment_key ) ? edd_get_payment_by( 'key', $payment_key ) : false;
-
-	if ( empty( $payment_key ) || empty( $token ) || empty( $_GET['verify_download'] ) || ! wp_verify_nonce( $_GET['verify_download'], 'edd_free_downloads_verify' ) ) {
-		if ( ! empty( $payment ) ) {
-			$download_id   = $payment->downloads[0]['id'];
-			$download      = new EDD_Download( $download_id );
-			$error_message = sprintf(
-				__( 'Error processing download of <a href="%s">%s</a>'),
-				get_permalink( $download_id ),
-				$download->get_name()
-			);
-		} else {
-			$error_message = __( 'Error processing download. Please contact support.', 'edd-free-downloads' );
-		}
-
-		wp_die( $error_message, __( 'Error', 'edd-free-downloads' ), 403 );
-	}
-
-	// Verify that the token provided matches that of the payment that exists.
-	if ( ! hash_equals( wp_hash( $payment->key, 'nonce' ), $token ) ) {
-		wp_die( __( 'Validation failed.', 'edd-free-downloads' ), __( 'Validation error', 'edd-free-downloads' ) );
-	}
-
-	if ( 'publish' !== $payment->status ) {
-
-		do_action( 'edd_free_downloads_pre_complete_payment', $payment->ID );
-
-		$payment->status = 'publish';
-		$payment->save();
-
-		do_action( 'edd_free_downloads_post_complete_payment', $payment->ID );
-
-		$payment->add_note( __( 'Free Downloads email verification complete.', 'edd-free-downloads' ) );
-	}
-
-	edd_free_downloads_complete_download( $payment );
-
-}
-add_action( 'edd_free_download_verify', 'edd_free_download_verify' );
 
 /**
  * When Free Downloads is about to mark a payment is complete, determine what email settings should be disabled.
