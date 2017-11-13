@@ -462,7 +462,16 @@ function edd_free_downloads_fetch_remote_file( $file_path, $hosted ) {
 			}
 		}
 
-		return $GLOBALS['edd_s3']->get_s3_url( $file_path, 25 );
+		if( function_exists( 'edd_amazon_s3' ) ) {
+
+			return edd_amazon_s3()->get_s3_url( $file_path, 25 );
+
+		} else {
+
+			return $GLOBALS['edd_s3']->get_s3_url( $file_path, 25 );
+
+		}
+
 
 	} elseif ( $hosted == 'dropbox' ) {
 		if ( class_exists( 'EDDDropboxFileStore' ) ) {
