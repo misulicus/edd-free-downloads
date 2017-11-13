@@ -515,7 +515,7 @@ function edd_free_downloads_process_auto_download() {
 	$custom_url         = edd_get_option( 'edd_free_downloads_redirect', false );
 	$custom_url         = $custom_url ? esc_url( $custom_url ) : $success_page;
 
-	if( is_array( $download_files ) && count( $download_files ) > 0 && ( $on_complete === 'auto-download' ) ) {
+	if( is_array( $download_files ) && count( $download_files ) > 0 && $on_complete === 'auto-download' ) {
 		if ( count( $download_files ) > 1 ) {
 			$download_url = edd_free_downloads_compress_files( $download_files, $download_id );
 			$download_url = str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $download_url );

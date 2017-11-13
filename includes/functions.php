@@ -454,7 +454,7 @@ function edd_free_downloads_fetch_remote_file( $file_path, $hosted ) {
 	$wp_upload_dir = wp_upload_dir();
 	$filePath      = $wp_upload_dir['basedir'] . '/edd-free-downloads-cache/';
 
-	if ( $hosted == 'amazon' && isset( $GLOBALS['edd_s3'] ) ) {
+	if ( $hosted == 'amazon' && defined( 'EDD_AS3_VERSION' ) ) {
 		// Handle S3
 		if ( false !== ( strpos( $file_path, 'AWSAccessKeyId' ) ) ) {
 			if ( $url = parse_url( $file_path ) ) {
@@ -462,7 +462,16 @@ function edd_free_downloads_fetch_remote_file( $file_path, $hosted ) {
 			}
 		}
 
-		return $GLOBALS['edd_s3']->get_s3_url( $file_path, 25 );
+		if( function_exists( 'edd_amazon_s3' ) ) {
+
+			return edd_amazon_s3()->get_s3_url( $file_path, 25 );
+
+		} else {
+
+			return $GLOBALS['edd_s3']->get_s3_url( $file_path, 25 );
+
+		}
+
 
 	} elseif ( $hosted == 'dropbox' ) {
 		if ( class_exists( 'EDDDropboxFileStore' ) ) {
