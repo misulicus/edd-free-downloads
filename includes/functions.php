@@ -454,7 +454,7 @@ function edd_free_downloads_fetch_remote_file( $file_path, $hosted ) {
 	$wp_upload_dir = wp_upload_dir();
 	$filePath      = $wp_upload_dir['basedir'] . '/edd-free-downloads-cache/';
 
-	if ( $hosted == 'amazon' && isset( $GLOBALS['edd_s3'] ) ) {
+	if ( $hosted == 'amazon' && defined( 'EDD_AS3_VERSION' ) ) {
 		// Handle S3
 		if ( false !== ( strpos( $file_path, 'AWSAccessKeyId' ) ) ) {
 			if ( $url = parse_url( $file_path ) ) {
