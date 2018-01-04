@@ -108,10 +108,6 @@ jQuery(document.body).ready(function ($) {
                 $(this).closest('.edd_download_purchase_form').find('a.edd-free-downloads-variable').attr('href', dlUrl);
             }
         });
-
-        $(document.body).on('click', '.edd-free-downloads-variable', function (e) {
-            e.preventDefault();
-        });
     }
 
     /**
@@ -338,6 +334,7 @@ jQuery(document.body).ready(function ($) {
 
                     $( '#edd-free-downloads-modal' ).on( 'click', 'a.edd-free-downloads-direct-download-link', function( e ) {
                         e.preventDefault();
+                        console.log( 'test1' );
                         edd_fd_process_direct_download_link($(this ));
                     });
 
@@ -382,11 +379,6 @@ jQuery(document.body).ready(function ($) {
 
         });
     }  // End on click.
-
-    body.on( 'click', 'a.edd-free-downloads-direct-download-link', function( e ) {
-        e.preventDefault();
-        edd_fd_process_direct_download_link($(this ));
-    });
 
     function edd_fd_process_direct_download_link( target ) {
 
