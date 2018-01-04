@@ -61,7 +61,6 @@ jQuery(document.body).ready(function ($) {
 
                     $(this).css('display', 'none');
                     $(this).parent().find('.edd-free-downloads-variable-wrapper').css('display', 'block');
-                    $(this).parent().find('.edd-free-downloads-variable').attr('href', dlUrl + '&download_id=' + download_id + '&price_ids=' + selected);
                 } else {
                     if ($(this).prev().find('input[name="edd_options[price_id][]"]:checked').attr('data-price') === '0.00') {
                         $(this).css('display', 'none');
@@ -93,8 +92,6 @@ jQuery(document.body).ready(function ($) {
                 if (total === 0) {
                     $(this).closest('.edd_download_purchase_form').find('.edd_purchase_submit_wrapper').css('display', 'none');
                     $(this).closest('.edd_download_purchase_form').find('.edd-free-downloads-variable-wrapper').css('display', 'block');
-
-                    $(this).closest('.edd_download_purchase_form').find('a.edd-free-downloads-variable').attr('href', dlUrl + '&download_id=' + dlId + '&price_ids=' + priceId);
                 } else {
                     $(this).closest('.edd_download_purchase_form').find('.edd_purchase_submit_wrapper').css('display', 'block');
                     $(this).closest('.edd_download_purchase_form').find('.edd-free-downloads-variable-wrapper').css('display', 'none');
@@ -134,7 +131,8 @@ jQuery(document.body).ready(function ($) {
             return false;
         });
     } else {
-        body.on( 'click', 'a.edd-free-download', function() {
+        body.on( 'click', 'a.edd-free-download', function(e) {
+            e.preventDefault();
 
             var edd_download_id = $( this ).data( 'download-id' );
             var price_ids       = [];
@@ -382,11 +380,6 @@ jQuery(document.body).ready(function ($) {
 
         });
     }  // End on click.
-
-    body.on( 'click', 'a.edd-free-downloads-direct-download-link', function( e ) {
-        e.preventDefault();
-        edd_fd_process_direct_download_link($(this ));
-    });
 
     function edd_fd_process_direct_download_link( target ) {
 
