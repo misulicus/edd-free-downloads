@@ -336,7 +336,6 @@ jQuery(document.body).ready(function ($) {
 
                     $( '#edd-free-downloads-modal' ).on( 'click', 'a.edd-free-downloads-direct-download-link', function( e ) {
                         e.preventDefault();
-                        console.log( 'test1' );
                         edd_fd_process_direct_download_link($(this ));
                     });
 
