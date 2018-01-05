@@ -414,6 +414,12 @@ function edd_free_downloads_download_file( $download_url, $hosted ) {
 				$file_path  = str_replace( set_url_scheme( content_url(), 'https' ), WP_CONTENT_DIR, $download_url );
 				$file_path  = realpath( $file_path );
 				$direct     = true;
+			} elseif ( strpos( content_url(), 'https://' ) !== false && strpos( $download_url, set_url_scheme( content_url(), 'http' ) ) !== false ) {
+				/** This is a local file given by an HTTP URL - but it should be using HTTPS so we need to figure out the path */
+				$file_path  = preg_replace( "/^http:/i", "https:", $download_url, 1 );
+				$file_path  = str_replace( set_url_scheme( content_url(), 'https' ), WP_CONTENT_DIR, $file_path );
+				$file_path  = realpath( $file_path );
+				$direct     = true;
 			}
 
 			// Set the file size header
