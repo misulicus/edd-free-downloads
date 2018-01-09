@@ -380,6 +380,11 @@ jQuery(document.body).ready(function ($) {
 
         });
     }  // End on click.
+    
+    body.on( 'click', 'a.edd-free-downloads-direct-download-link', function( e ) {
+        e.preventDefault();
+        edd_fd_process_direct_download_link($(this ));
+    });
 
     function edd_fd_process_direct_download_link( target ) {
 
