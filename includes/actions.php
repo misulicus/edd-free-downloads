@@ -49,10 +49,21 @@ function edd_free_downloads_remove_optin() {
 		if ( class_exists( 'EDD_MailChimp' ) ) {
 			global $edd_mc;
 
-			if ( isset( $_POST['edd_free_download_optin'] ) ) {
-				$edd_mc->subscribe_email( $user_info );
+			if ( empty( $edd_mc ) ) {
+
+				// Someone is running MailChimp 3.0
+				$list = EDD_MailChimp_List::get_default();
+				$list->subscribe( $user_info );
+
 			} else {
-				remove_action( 'edd_complete_download_purchase', array( $edd_mc, 'completed_download_purchase_signup' ) );
+
+				// Running pre MailChimp 3.0
+				if ( isset( $_POST['edd_free_download_optin'] ) ) {
+					$edd_mc->subscribe_email( $user_info );
+				} else {
+					remove_action( 'edd_complete_download_purchase', array( $edd_mc, 'completed_download_purchase_signup' ) );
+				}
+
 			}
 		}
 
