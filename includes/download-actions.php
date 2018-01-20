@@ -468,6 +468,14 @@ function edd_free_downloads_process_auto_download() {
 				$payment->user_email  = $user->data->user_email;
 				$payment->customer_id = $customer->id;
 
+				// Triggers EDD_Payment to create a customer
+				if ( empty( $customer->id ) ) {
+					$payment->email = $payment->user_email;
+					$payment->user_id = get_current_user_id();
+					$payment->first_name = $user->first_name;
+					$payment->last_name = $user->last_name;
+				}
+
 				if ( is_array( $price_ids ) ) {
 					foreach ( $price_ids as $price_id ) {
 						$payment->add_download( $download_id, array(
