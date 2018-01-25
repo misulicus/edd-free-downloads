@@ -53,7 +53,9 @@ function edd_free_downloads_remove_optin() {
 
 				// Someone is running MailChimp 3.0
 				$list = EDD_MailChimp_List::get_default();
-				$list->subscribe( $user_info );
+				if ( ! empty( $list ) ) {
+					$list->subscribe( $user_info );
+				}
 
 			} else {
 
