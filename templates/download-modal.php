@@ -31,7 +31,8 @@ if ( isset( $_GET['download_id'] ) && ! empty( $_GET['download_id'] ) ) {
 	global $post; // Leaving here for backwards compat.
 }
 
-$price_ids = isset( $_GET['price_ids'] ) ? array_map( 'absint', $_GET['price_ids'] ) : array();
+$download_id = $post->ID;
+$price_ids   = isset( $_GET['price_ids'] ) ? array_map( 'absint', $_GET['price_ids'] ) : array();
 ?>
 <?php if ( edd_get_option( 'edd_free_downloads_close_button', false ) ) : ?>
 <span class="dashicons dashicons-no-alt edd-free-downloads-modal-close"></span>
@@ -155,7 +156,7 @@ $price_ids = isset( $_GET['price_ids'] ) ? array_map( 'absint', $_GET['price_ids
 	</div>
 
 	<input type="hidden" name="edd_action" value="free_download_process" />
-	<input type="hidden" name="edd_free_download_id" value="<?php echo intval( $_GET['download_id'] ); ?>" />
+	<input type="hidden" name="edd_free_download_id" value="<?php echo $download_id; ?>" />
 
 	<?php foreach ( $price_ids as $price_id ) : ?>
 	<input type="hidden" name="edd_free_download_price_id[]" value="<?php echo absint( $price_id ); ?>" />
