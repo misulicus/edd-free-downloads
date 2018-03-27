@@ -136,6 +136,9 @@ function edd_free_download_process() {
 		$user_last = $user ? $user->last_name : '';
 	}
 
+	// Ensure there is not any session data that might cause bad data. See https://github.com/easydigitaldownloads/edd-free-downloads/issues/260
+	add_filter( 'edd_fees_get_fees', '__return_empty_array' );
+
 	$price_ids    = isset( $_POST['edd_free_download_price_id'] ) ? $_POST['edd_free_download_price_id'] : false;
 
 	$payment = new EDD_Payment;
