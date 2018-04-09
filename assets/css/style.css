@@ -20,6 +20,13 @@ body.edd-frozen {
     -moz-transition: display 0.5s ease;
 }
 
+.edd-free-downloads-modal-wrapper .edd-loading {
+	position: relative;
+	top: 10%;
+	left: 50%;
+	opacity: 1;
+}
+
 @media screen and ( max-width: 1200px ) {
 
     .edd-free-downloads-modal-wrapper {

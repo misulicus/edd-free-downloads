@@ -53,7 +53,7 @@ function edd_free_downloads_remove_optin() {
 			if ( ! empty( $eddmc ) ) {
 
 				remove_action( 'edd_complete_purchase', array( $eddmc::$checkout, 'completed_purchase_signup' ), 10, 3 );
-				
+
 				if ( ! isset( $_POST['edd_free_download_optin'] ) ) {
 					return;
 				}
@@ -419,6 +419,6 @@ add_action( 'wp_ajax_nopriv_edd_free_downloads_get_file_path', 'edd_free_downloa
  * javascript targeting of the inner modal elements
  */
 function edd_free_downloads_add_modal_wrapper() {
-	echo '<div class="edd-free-downloads-modal-wrapper edd-free-downloads"><div id="edd-free-downloads-modal" style="display:none"></div></div>';
+	echo '<div class="edd-free-downloads-modal-wrapper edd-free-downloads"><span class="edd-loading"></span><div id="edd-free-downloads-modal" style="display:none"></div></div>';
 }
 add_action( 'wp_footer', 'edd_free_downloads_add_modal_wrapper' );

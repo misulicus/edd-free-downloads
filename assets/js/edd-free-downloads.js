@@ -9,6 +9,7 @@ jQuery(document.body).ready(function ($) {
      * clicking the close 'x', outside the modal, or pressing the escape key.
      */
     function eddFreeDownloadCloseModal() {
+        $('.edd-free-downloads-modal-wrapper .edd-loading').hide();
         $( '.edd-free-downloads-modal-wrapper' ).fadeOut( 250 ); // Hiding the modal wrapper again
         $( '#edd-free-downloads-modal' ).hide().html('');
         $( 'body' ).removeClass( 'edd-frozen' );
@@ -149,6 +150,7 @@ jQuery(document.body).ready(function ($) {
 
             var modal_wrapper = $('.edd-free-downloads-modal-wrapper');
             modal_wrapper.fadeIn( 250 );
+            $('.edd-free-downloads-modal-wrapper .edd-loading').show();
 
             $.ajax({
                 url: edd_free_downloads_vars.ajaxurl,
@@ -173,6 +175,7 @@ jQuery(document.body).ready(function ($) {
 
                     var modal_container = $('#edd-free-downloads-modal');
                     modal_container.prepend( data ).fadeIn(250);
+                    $('.edd-free-downloads-modal-wrapper .edd-loading').hide();
 
 
                     $( '.edd-free-downloads-modal-wrapper .edd-free-downloads-modal-close' ).on( 'click', function() {
