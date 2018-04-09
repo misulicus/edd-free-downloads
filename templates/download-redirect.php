@@ -96,8 +96,9 @@ $require_login = edd_no_guest_checkout();
 	<?php endif; ?>
 
 	<?php if ( edd_get_option( 'edd_free_downloads_newsletter_optin', false ) && edd_free_downloads_has_newsletter_plugin() ) : ?>
+	<?php $check_by_default = edd_get_option( 'edd_free_downloads_newsletter_auto_checked', false ); ?>
 	<p>
-		<input type="checkbox" name="edd_free_download_optin" id="edd_free_download_optin" checked="checked" />
+		<input type="checkbox" name="edd_free_download_optin" id="edd_free_download_optin" <?php checked( true, $check_by_default, true ); ?> />
 		<label for="edd_free_download_optin" class="edd-free-downloads-checkbox-label"><?php echo edd_get_option( 'edd_free_downloads_newsletter_optin_label', __( 'Subscribe to our newsletter', 'edd-free-downloads' ) ); ?></label>
 	</p>
 	<?php endif; ?>

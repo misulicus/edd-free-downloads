@@ -388,6 +388,12 @@ function edd_free_downloads_newsletter_settings( $settings ) {
 				'type' => 'checkbox',
 			),
 			array(
+				'id'   => 'edd_free_downloads_newsletter_auto_checked',
+				'name' => __( 'Signup Checked by Default', 'edd-free-downloads' ),
+				'desc' => __( 'Should the newsletter signup checkbox be checked by default for Free Downloads?', 'edd-free-downloads' ),
+				'type' => 'checkbox',
+			),
+			array(
 				'id'   => 'edd_free_downloads_newsletter_optin_label',
 				'name' => __( 'Opt-In Field Label', 'edd-free-downloads' ),
 				'desc' => __( 'Specify the text to display for the opt-in field label.', 'edd-free-downloads' ),
