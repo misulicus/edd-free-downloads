@@ -27,13 +27,14 @@ function edd_free_downloads_scripts() {
 
 	$suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
 
-	wp_register_script( 'edd-free-downloads-mobile', EDD_FREE_DOWNLOADS_URL . 'assets/js/isMobile'. $suffix . '.js', array( 'jquery' ) );
+	// Defining 'null' here for the 4th parameter for 'version' results in no version string attached, which is ideal here.
+	wp_register_script( 'edd-free-downloads-mobile', EDD_FREE_DOWNLOADS_URL . 'assets/js/isMobile'. $suffix . '.js', array( 'jquery' ), null, true );
 	wp_enqueue_script( 'edd-free-downloads-mobile' );
 
 	wp_register_style( 'edd-free-downloads', EDD_FREE_DOWNLOADS_URL . 'assets/css/style' . $suffix . '.css', array(), EDD_FREE_DOWNLOADS_VER );
 	wp_enqueue_style( 'edd-free-downloads' );
 
-	wp_register_script( 'edd-free-downloads', EDD_FREE_DOWNLOADS_URL . 'assets/js/edd-free-downloads' . $suffix . '.js', array( 'jquery' ), EDD_FREE_DOWNLOADS_VER );
+	wp_register_script( 'edd-free-downloads', EDD_FREE_DOWNLOADS_URL . 'assets/js/edd-free-downloads' . $suffix . '.js', array( 'jquery' ), EDD_FREE_DOWNLOADS_VER, true );
 	wp_enqueue_script( 'edd-free-downloads' );
 
 	// Localize some settings for use in Javascript.
