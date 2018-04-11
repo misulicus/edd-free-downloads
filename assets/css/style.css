@@ -54,28 +54,25 @@ form#edd_free_download_form {
 }
 
 .edd-free-downloads-modal-close {
-    width: 24px;
-    height: 24px;
     position: absolute;
     top: -10px;
     right: -10px;
     background: #fff;
-    border-radius: 50%;
     color: #999;
-    transition: color 0.5s ease;
-}
-
-.admin-bar .edd-free-downloads-modal-close {
-    padding-top: 2px;
-    padding-left: 1px;
+    font-size: 20px;
+    line-height: 1;
+    text-align: center;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    transition: color 0.2s ease;
+    -webkit-transition: color 0.2s ease;
+    -moz-transition: color 0.2s ease;
 }
 
 .edd-free-downloads-modal-close:hover {
     cursor: pointer;
     color: #555;
-    transition: color 0.5s ease;
-    -webkit-transition: color 0.5s ease;
-    -moz-transition: color 0.5s ease;
 }
 
 #edd-free-downloads-modal label {

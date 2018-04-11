@@ -358,7 +358,7 @@ jQuery(document.body).ready(function ($) {
                     });
 
                     /**
-                     * If you user is focused on the email field and presses enter
+                     * If the user is focused on the email field and presses enter
                      * this will "click" the download botton
                      */
                     body.on('keypress', '.edd-free-download-field', function (e) {
@@ -367,6 +367,17 @@ jQuery(document.body).ready(function ($) {
                             return false;
                         }
                     });
+
+					/**
+					 * If the user is focused on the close element and presses enter or spacebar,
+					 * this will "click" the close botton
+					 */
+					body.on('keypress', '.edd-free-downloads-modal-close', function (e) {
+						if (e.which === 13 || e.which === 32) {
+							$('.edd-free-downloads-modal-close').click();
+							return false;
+						}
+					});
 
                     /**
                      * Allowing for pressing escape key to close modal
@@ -383,7 +394,7 @@ jQuery(document.body).ready(function ($) {
 
         });
     }  // End on click.
-    
+
     body.on( 'click', 'a.edd-free-downloads-direct-download-link', function( e ) {
         e.preventDefault();
         edd_fd_process_direct_download_link($(this ));

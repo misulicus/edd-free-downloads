@@ -18,13 +18,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return      void
  */
 function edd_free_downloads_scripts() {
-	/**
-	 * Safari does not seem to load these style for logged
-	 * out users on occasion. Here we are using the same handle
-	 * as core to ensure this only gets enqueued once.
-	 */
-	wp_enqueue_style( 'dashicons', site_url( '/wp-includes/css/dashicons.min.css' ) );
-
 	$suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
 
 	// Defining 'null' here for the 4th parameter for 'version' results in no version string attached, which is ideal here.

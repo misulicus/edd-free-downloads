@@ -34,9 +34,6 @@ if ( isset( $_GET['download_id'] ) && ! empty( $_GET['download_id'] ) ) {
 $download_id = $post->ID;
 $price_ids   = isset( $_GET['price_ids'] ) ? array_map( 'absint', $_GET['price_ids'] ) : array();
 ?>
-<?php if ( edd_get_option( 'edd_free_downloads_close_button', false ) ) : ?>
-<span class="dashicons dashicons-no-alt edd-free-downloads-modal-close"></span>
-<?php endif; ?>
 <form id="edd_free_download_form" method="post">
 	<?php do_action( 'edd_free_downloads_before_modal_form', $post ); ?>
 	<p>
@@ -219,6 +216,9 @@ $price_ids   = isset( $_GET['price_ids'] ) ? array_map( 'absint', $_GET['price_i
 
 	<?php do_action( 'edd_free_downloads_after_download_button', $post ); ?>
 </form>
+<?php if ( edd_get_option( 'edd_free_downloads_close_button', false ) ) : ?>
+	<span class="edd-free-downloads-modal-close" aria-label="<?php _ex( 'close', 'close button for download modal','edd-free-downloads' ) ?>" role="button" tabindex="0">&#10005;</span>
+<?php endif; ?>
 <?php
 /**
  * This template is called via AJAX and we switch the $post
