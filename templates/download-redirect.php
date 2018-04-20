@@ -156,6 +156,17 @@ $require_login = edd_no_guest_checkout();
 
 	<input type="hidden" name="edd_action" value="free_download_process" />
 	<input type="hidden" name="edd_free_download_id" value="<?php echo $wp_query->query_vars['download_id']; ?>" />
+
+	// Detect if the price_ids are present.
+	<?php $price_ids = ! empty( $_GET['price_ids'] ) ? json_decode( $_GET['price_ids'] ) : false; ?>
+
+	// If items are present, and json_decode is successful, output the price_ids.
+	<?php if ( ! empty( $price_ids )  ) : ?>
+		<?php foreach ( $price_ids as $price_id ) : ?>
+			<input type="hidden" name="edd_free_download_price_id[]" value="<?php echo absint( $price_id ); ?>" />
+		<?php endforeach; ?>
+	<?php endif; ?>
+
 	<button name="edd_free_download_submit" class="edd-free-download-submit button <?php echo $color; ?>"><span><?php echo $label; ?></span></button>
 	<button name="edd_free_download_cancel" class="edd-free-download-cancel button <?php echo $color; ?>"><span><?php _e( 'Cancel', 'edd-free-downloads' ); ?></span></button>
 

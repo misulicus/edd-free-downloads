@@ -57,9 +57,6 @@ jQuery(document.body).ready(function ($) {
                 $(this).parent().find('.edd-free-downloads-variable').attr('data-download-id', download_id);
 
                 if ($(this).prev().find('input[name="edd_options[price_id][]"]:checked').attr('data-price') === '0.00') {
-                    var dlUrl    = $(this).parent().find('.edd-free-downloads-variable').attr('href');
-                    var selected = $(this).prev().find('input[name="edd_options[price_id][]"]:checked').val();
-
                     $(this).css('display', 'none');
                     $(this).parent().find('.edd-free-downloads-variable-wrapper').css('display', 'block');
                 } else {
@@ -75,22 +72,29 @@ jQuery(document.body).ready(function ($) {
         });
 
         body.on('change', 'input[name="edd_options[price_id][]"]', function () {
-            var total   = 0;
-            var checked = 0;
-            var priceId = 0;
-            var dlUrl   = $(this).closest('.edd_download_purchase_form').find('a.edd-free-downloads-variable').attr('href');
-            var dlId    = $(this).closest('.edd_download_purchase_form').find('.edd_purchase_submit_wrapper').find('.edd-add-to-cart').attr('data-download-id');
+            var total     = 0;
+            var checked   = 0;
+            var price_ids = [];
+            var dlUrl     = $(this).closest('.edd_download_purchase_form').find('a.edd-free-downloads-variable').attr('href');
+            var dlId      = $(this).closest('.edd_download_purchase_form').find('.edd_purchase_submit_wrapper').find('.edd-add-to-cart').attr('data-download-id');
+
+            dlUrl = edd_free_downloads_append_query_string( dlUrl, 'download_id', dlId );
 
             $(this).closest('ul').find('input[name="edd_options[price_id][]"]').each(function () {
                 if ($(this).is(':checked')) {
                     total += parseFloat($(this).attr('data-price'));
                     checked += 1;
-                    priceId = $(this).val();
+                    price_ids.push(parseInt($(this).val()));
                 }
             });
 
             if (checked !== 0) {
                 if (total === 0) {
+                    var price_id_string = JSON.stringify(price_ids);
+                    dlUrl = edd_free_downloads_append_query_string( dlUrl, 'price_ids', price_id_string );
+
+                    $(this).closest('.edd_download_purchase_form').find('a.edd-free-downloads-variable').attr('href', dlUrl);
+
                     $(this).closest('.edd_download_purchase_form').find('.edd_purchase_submit_wrapper').css('display', 'none');
                     $(this).closest('.edd_download_purchase_form').find('.edd-free-downloads-variable-wrapper').css('display', 'block');
                 } else {
@@ -439,3 +443,14 @@ jQuery(document.body).ready(function ($) {
 
     }
 });
+
+function edd_free_downloads_append_query_string(uri, key, value) {
+	var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+	var separator = uri.indexOf('?') !== -1 ? "&" : "?";
+	if (uri.match(re)) {
+		return uri.replace(re, '$1' + key + "=" + value + '$2');
+	}
+	else {
+		return uri + separator + key + "=" + value;
+	}
+}
