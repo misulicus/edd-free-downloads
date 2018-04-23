@@ -551,20 +551,28 @@ function edd_free_downloads_process_auto_download() {
 		}
 
 		/**
-		 * Looping through files to create report logs
+		 * If the user submitted information and a payment was created, log the file download.
+		 *
+		 * If the Direct Download option is enabled, and the user clicks the direct download link, no payment is created
+		 * and we should bypass this attempt to log the file download as the necessary information is not present.
 		 */
-		foreach ( $download_files as $download_file ) {
-			edd_record_download_in_log(
-				$download_file['download_id'],
-				$download_file['file_id'],
-				array(
-					'email' => $payment->email,
-					'id'    => get_current_user_id(),
-					'name'  => $payment->first_name . ' ' . $payment->last_name,
-				),
-				edd_get_ip(),
-				$payment->ID
-			);
+		if ( ! empty( $payment ) ) {
+			/**
+			 * Looping through files to create report logs
+			 */
+			foreach ( $download_files as $download_file ) {
+				edd_record_download_in_log(
+					$download_file['download_id'],
+					$download_file['file_id'],
+					array(
+						'email' => $payment->email,
+						'id'    => get_current_user_id(),
+						'name'  => $payment->first_name . ' ' . $payment->last_name,
+					),
+					edd_get_ip(),
+					$payment->ID
+				);
+			}
 		}
 
 		edd_free_downloads_download_file( $download_url, $hosted );
