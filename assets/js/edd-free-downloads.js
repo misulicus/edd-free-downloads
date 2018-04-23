@@ -302,6 +302,14 @@ jQuery(document.body).ready(function ($) {
                             }
                         }
 
+                        // If the privacy policy checkbox is shown, and not checked.
+                        if ($('#edd-free-download-privacy-agreement').length && !$('#edd-free-download-privacy-agreement').is(':checked')) {
+                            has_error++;
+                            $('#edd-free-download-error-privacy-policy').css('display', 'block');
+                        } else {
+                            $('#edd-free-download-error-privacy-policy').css('display', 'none');
+                        }
+
                         if (has_error === 0) {
                             if ( edd_free_downloads_vars.email_verification === '1' ) {
                                 e.preventDefault();

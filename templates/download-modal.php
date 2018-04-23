@@ -112,6 +112,20 @@ $price_ids   = isset( $_GET['price_ids'] ) ? array_map( 'absint', $_GET['price_i
 		</p>
 	<?php endif; ?>
 
+	<?php $show_privacy_policy = edd_get_option( 'edd_free_downloads_display_privacy_policy_agreement', false ); ?>
+	<?php $privacy_policy_page = edd_get_option( 'privacy_agree_page', false ); ?>
+	<?php if ( ! empty( $show_privacy_policy ) && ! empty( $privacy_policy_page ) ) : ?>
+		<?php $privacy_policy_permalink = get_permalink( edd_get_option( 'privacy_agree_page', 0 ) ); ?>
+		<?php if ( ! empty( $privacy_policy_permalink ) ) : ?>
+		<p>
+			<input type="checkbox" name="edd_free_download_privacy_agreement" id="edd-free-download-privacy-agreement" value="1" />
+			<label for="edd-free-download-privacy-agreement" class="edd-free-downloads-checkbox-label">
+				<?php printf( __( 'Agree to the <a href="%s" target="_blank" rel="_noopener">Privacy Policy</a>', 'edd-free-downloads' ), $privacy_policy_permalink ); ?>
+			</label>
+		</p>
+		<?php endif; ?>
+	<?php endif; ?>
+
 	<?php if ( edd_get_option( 'edd_free_downloads_show_notes' ) ) : ?>
 		<?php
 			$title = $content = '';

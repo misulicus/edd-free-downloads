@@ -92,6 +92,11 @@ function edd_free_download_process() {
 		wp_die( esc_html__( 'Your email address or domain is not allowed to download content. Please contact support if you feel this is an error.', 'edd-free-downloads' ), esc_html__( 'Oops!', 'edd-free-downloads' ) );
 	}
 
+	// If privacy policy is required, verify it's checked.
+	if ( edd_get_option( 'edd_free_downloads_display_privacy_policy_agreement', false ) && empty( $_POST['edd_free_download_privacy_agreement'] ) ) {
+		wp_die( esc_html__( 'You must agree to the privacy policy to download this content.', 'edd-free-downloads' ), esc_html__( 'Oops!', 'edd-free-downloads' ) );
+	}
+
 	$download_id = isset( $_POST['edd_free_download_id'] ) ? intval( $_POST['edd_free_download_id'] ) : false;
 	/**
 	 * @todo  Update translation files

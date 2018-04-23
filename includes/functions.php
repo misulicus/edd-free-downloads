@@ -135,7 +135,8 @@ function edd_free_downloads_form_errors() {
 		'username-required'  => __( 'Please enter a username', 'edd-free-downloads' ),
 		'password-required'  => __( 'Please enter a password', 'edd-free-downloads' ),
 		'password2-required' => __( 'Please confirm your password', 'edd-free-downloads' ),
-		'password-unmatch'   => __( 'Password and password confirmation do not match', 'edd-free-downloads' )
+		'password-unmatch'   => __( 'Password and password confirmation do not match', 'edd-free-downloads' ),
+		'privacy-policy'     => __( 'Please agree to the privacy policy', 'edd-free-downloads' ),
 	) );
 
 	return $errors;
