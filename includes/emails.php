@@ -87,13 +87,13 @@ function edd_free_download_verify() {
 
 			if ( $expired ) {
 				$error_message = sprintf(
-					__( 'Your verification link for <a href="%s">%s</a> has expired'),
+					__( 'Your verification link for <a href="%s">%s</a> has expired', 'edd-free-downloads' ),
 					get_permalink( $download_id ),
 					$download->get_name()
 				);
 			} else {
 				$error_message = sprintf(
-					__( 'Error processing download of <a href="%s">%s</a>'),
+					__( 'Error processing download of <a href="%s">%s</a>', 'edd-free-downloads' ),
 					get_permalink( $download_id ),
 					$download->get_name()
 				);
