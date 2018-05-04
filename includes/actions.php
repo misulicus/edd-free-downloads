@@ -58,7 +58,19 @@ function edd_free_downloads_remove_optin() {
 					return;
 				}
 
-				add_filter( 'edd.mailchimp.customer.opt_in_status', '__return_true' );
+				$download = new EDD_MailChimp_Download( absint( $_POST['edd_free_download_id'] ) );
+				$preferences = $download->subscription_preferences();
+
+				foreach( $preferences as $preference ) {
+
+					$list = new EDD_MailChimp_List( $preference['remote_id'] );
+					$options = array( 'interests' => $preference['interests'] );
+					$options['double_opt_in'] = false;
+
+					$subscribed = $list->subscribe( $user_info, $options );
+					add_filter( 'edd.mailchimp.customer.opt_in_status', '__return_true' );
+
+				}
 
 			} else {
 
