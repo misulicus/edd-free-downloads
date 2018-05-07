@@ -71,7 +71,7 @@ function edd_free_downloads_remove_optin() {
 					$subscribed = $list->subscribe( $user_info, $options );
 
 					// This handles the customer creation side with the 3.0 API for eCommerce in MailChimp
-					add_filter( 'edd.mailchimp.customer.opt_in_status', '__return_true' );
+					add_filter( 'edd.mailchimp.customer.opt_in_status', $double_opt_in );
 
 				}
 
