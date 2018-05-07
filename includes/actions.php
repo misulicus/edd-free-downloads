@@ -63,11 +63,14 @@ function edd_free_downloads_remove_optin() {
 
 				foreach( $preferences as $preference ) {
 
-					$list = new EDD_MailChimp_List( $preference['remote_id'] );
-					$options = array( 'interests' => $preference['interests'] );
-					$options['double_opt_in'] = false;
+					$list                     = new EDD_MailChimp_List( $preference['remote_id'] );
+					$options                  = array( 'interests' => $preference['interests'] );
+					$double_opt_in            = (bool) edd_get_option( 'eddmc_double_opt_in', false );
+					$options['double_opt_in'] = $double_opt_in;
 
 					$subscribed = $list->subscribe( $user_info, $options );
+
+					// This handles the customer creation side with the 3.0 API for eCommerce in MailChimp
 					add_filter( 'edd.mailchimp.customer.opt_in_status', '__return_true' );
 
 				}
