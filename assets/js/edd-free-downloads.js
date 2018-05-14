@@ -131,19 +131,6 @@ jQuery(document.body).ready(function ($) {
             window.location.href = $(this).attr('href');
         });
 
-        var edd_download_id = $( this ).data( 'download-id' );
-        var price_ids       = [];
-        var variable_prices = $(this).parent().parent().find('input[name="edd_options[price_id][]"]');
-        if (variable_prices.length > 0) {
-            variable_prices.each(function () {
-                $(this).parent().parent().find('input[name="edd_options[price_id][]"]').each(function () {
-                    if ($(this).prop('checked') || $(this).attr('type') === 'hidden') {
-                        price_ids.push($(this).val().toString());
-                    }
-                });
-            });
-        }
-
         // Set up the download button's click listener and resulting ajax call
         edd_fd_set_up_download_click_listener();
 
