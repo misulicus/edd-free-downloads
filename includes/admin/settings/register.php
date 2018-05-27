@@ -76,9 +76,9 @@ function edd_free_downloads_add_settings( $settings ) {
 
 	// Conditionally add the privacy policy option, since it is only supported by EDD 2.9.1
 	if ( version_compare( EDD_VERSION, '2.9.1', '>=' ) ) {
-		$privacy_policy_page = edd_get_option( 'privacy_agree_page', 0 );
+		$privacy_policy_page = get_option( 'wp_page_for_privacy_policy', 0 );
 
-		$privacy_policy_page_settings = admin_url( 'edit.php?post_type=download&page=edd-settings&tab=misc&section=site_terms' );
+		$privacy_policy_page_settings = admin_url( 'edit.php?post_type=download&page=edd-settings&tab=privacy' );
 		$disabled = empty( $privacy_policy_page );
 		$description = $disabled ?
 			sprintf( __( 'To enable this option, you need to <a href="%s">select a Privacy Policy page</a>.', 'edd-free-downloads' ), $privacy_policy_page_settings ) :
