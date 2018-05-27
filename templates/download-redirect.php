@@ -104,9 +104,9 @@ $require_login = edd_no_guest_checkout();
 	<?php endif; ?>
 
 	<?php $show_privacy_policy = edd_get_option( 'edd_free_downloads_display_privacy_policy_agreement', false ); ?>
-	<?php $privacy_policy_page = edd_get_option( 'privacy_agree_page', false ); ?>
+	<?php $privacy_policy_page = get_option( 'wp_page_for_privacy_policy' ); ?>
 	<?php if ( ! empty( $show_privacy_policy ) && ! empty( $privacy_policy_page ) ) : ?>
-		<?php $privacy_policy_permalink = get_permalink( edd_get_option( 'privacy_agree_page', 0 ) ); ?>
+		<?php $privacy_policy_permalink = get_permalink( get_option( 'wp_page_for_privacy_policy' ) ); ?>
 		<?php if ( ! empty( $privacy_policy_permalink ) ) : ?>
 			<p>
 				<input type="checkbox" name="edd_free_download_privacy_agreement" id="edd-free-download-privacy-agreement" value="1" />
